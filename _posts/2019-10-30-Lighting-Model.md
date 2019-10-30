@@ -9,6 +9,7 @@ meta: "Unity Shader"
 ---
 
 <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
+[TOC]
 
 ### 引题
 
@@ -17,6 +18,7 @@ meta: "Unity Shader"
 #### 光源
 
 在实时渲染中，光源可以看作是一个没有体积的点，用l表示其方向，用**辐射度(irradiance)** 来量化。比如平行光，其辐射度可通过计算在垂直于l的单位面积上单位时间内穿过的能量来得到。而计算物体表面的辐射度，可以利用光源方向l和表面法线n之间的夹角的余弦值来得到。（ps. 方向矢量默认模长为1）。实际计算中，辐射度与cosθ成正比，所以使用**点积**来计算。
+
 #### 吸收与散射
 
 光源与物体相交的结果有两个：**散射**和**吸收**。散射只改变光线方向，不改变光线密度和颜色，而吸收相反。光线在物体表面的散射又分为折射（或说透射）和反射两种。光照模型中，**高光反射**属性表示物体表面的反射，**漫反射**属性表示物体表面的折射，吸收和散射。**出射度**用来描述出射光线的数量和方向。辐射度与出射度的比值也就是材质的漫反射和高光属性。
@@ -34,30 +36,30 @@ BRDF全称**Bidirectional Reflectance Distribution Function**。当给定模型�
 
 标准光照模型的基本方法将进入到摄像机内的光线分为4部分：
 
- - **自发光(emissive)**：描述当给定一个方向时，一个表面本身会向该方向发射多少辐射量。
- - **高光反射(specular)**：描述当光线从光源照射到模型表面时，该表面会在完全镜面反射方向上辐射出多少辐射量。
- - **漫反射(diffuse)**：描述当光线从光源照射到模型表面时，该表面会向每个方向散射多少辐射量。
- - **环境光(ambient)**：描述其他所有的间接光照。
+- **自发光(emissive)**：描述当给定一个方向时，一个表面本身会向该方向发射多少辐射量。
+- **高光反射(specular)**：描述当光线从光源照射到模型表面时，该表面会在完全镜面反射方向上辐射出多少辐射量。
+- **漫反射(diffuse)**：描述当光线从光源照射到模型表面时，该表面会向每个方向散射多少辐射量。
+- **环境光(ambient)**：描述其他所有的间接光照。
 
 #### 环境光
 
- 间接光照是指光线在进入摄像机之前经过了多次物体的反射。在标准光照模型中，使用一种被称为**环境光**的部分来近似间接光照。
+间接光照是指光线在进入摄像机之前经过了多次物体的反射。在标准光照模型中，使用一种被称为**环境光**的部分来近似间接光照。
 
 ### 自发光
 
- 自发光是指光线没有经过任何反射之间进入到摄像机中。标准光照模型使用**自发光（颜色）**来计算这个部分的贡献，但该物体并不被当成一个光源，去照亮周围的其他表面。
+自发光是指光线没有经过任何反射之间进入到摄像机中。标准光照模型使用**自发光（颜色）**来计算这个部分的贡献，但该物体并不被当成一个光源，去照亮周围的其他表面。
 
 ### 漫反射
 
- 漫反射光照符合**兰伯特定律(Lambert's Law)**,反射强度与表面法线和光源方向之间的夹角的余弦值成正比
+漫反射光照符合**兰伯特定律(Lambert's Law)**,反射强度与表面法线和光源方向之间的夹角的余弦值成正比
 
 ### 高光反射
 
- 高光可以使得物体具有金属的材质。一般采用**Phong模型**或者**Blinn模型**去计算，其中Blinn模型在摄像机和光源距离够远时会快于Phong模型。两者都是经验模型
+高光可以使得物体具有金属的材质。一般采用**Phong模型**或者**Blinn模型**去计算，其中Blinn模型在摄像机和光源距离够远时会快于Phong模型。两者都是经验模型
 
 ### 逐像素/逐顶点
 
- 通常来讲，在片元着色器中计算光照被称为逐像素光照，而在顶点着色器中计算被称为逐顶点光照。逐像素光照以每个像素为基础得到其法线，然后计算光照模型，又称**Phong着色(Phong Shading,不同于Phong光照模型)**。逐顶点光照又称为**高洛德着色**，它在每个顶点上计算光照，在渲染图元内部进行线性插值，输出成像素颜色。很显然其计算量小于逐像素着色，但由于使用线性插值，将导致明显的棱角现象。
+通常来讲，在片元着色器中计算光照被称为逐像素光照，而在顶点着色器中计算被称为逐顶点光照。逐像素光照以每个像素为基础得到其法线，然后计算光照模型，又称**Phong着色(Phong Shading,不同于Phong光照模型)**。逐顶点光照又称为**高洛德着色**，它在每个顶点上计算光照，在渲染图元内部进行线性插值，输出成像素颜色。很显然其计算量小于逐像素着色，但由于使用线性插值，将导致明显的棱角现象。
 
 ### 实践一 实现漫反射光照模型
 
@@ -71,31 +73,26 @@ BRDF全称**Bidirectional Reflectance Distribution Function**。当给定模型�
 
 #### 计算公式
 
- 首先给出基本光照模型中漫反射部分的计算公式
+首先给出基本光照模型中漫反射部分的计算公式
 
-|![](formulas/6_1.gif)|
-|:--:|
+![漫反射部分的计算公式](D:\wonderly321.github.io\assets\image\formulas\6_1.gif)
 
- 从公式可以看出，要计算漫反射需要知道4个参数：入射光线的颜色和强度![](formulas/6_2.gif)，材质的漫反射系数![](formulas/6_3.gif)，表面法线![](formulas/6_4.gif)以及光源方向![](formulas/6_5.gif)。
+从公式可以看出，要计算漫反射需要知道4个参数：入射光线的颜色和强度![](D:\wonderly321.github.io\assets\image\formulas\6_2.gif)，材质的漫反射系数![](D:\wonderly321.github.io\assets\image\formulas\6_3.gif)，表面法线![](D:\wonderly321.github.io\assets\image\formulas\6_4.gif)以及光源方向![](D:\wonderly321.github.io\assets\image\formulas\6_5.gif)。
 
- 为防止点积结果为负值，需使用max操作，而CG提供的saturate函数可以达到同样的目的。
+为防止点积结果为负值，需使用max操作，而CG提供的saturate函数可以达到同样的目的。
 
 #### 逐顶点光照
 
- 最终效果类似于下图：
+最终效果类似于下图：
 
- |![](illustrations/1_1.png)|
-|:--:|
-
+ ![](D:\wonderly321.github.io\assets\image\illustrations\1_1.png) 
 
 准备工作：
-(1) 在Unity中新建一个场景，命名为Scene_6_4。默认场景中将包含一个摄像机和一个平行光，并使用内置的天空盒子。为便于查看效果，在Window->Rendering->Lighting Seting->Skybox中去掉场景中的天空盒子。
 
-(2) 新建Shader(右键Create->Shader->UnitySurfaceShader)并命名为DiffuseVertexLevel；新建材质(右键Create->Material)并命名为DiffuseVertexLevelMat，将新建的Shader拖拽赋给新建材质。
-
-(3) 在场景中新建一个胶囊体(菜单栏GameObject->3D Object->Capsule)，将其材质修改为新建材质。
-
-(4) 保存场景。
+1.  在Unity中新建一个场景，命名为Scene_6_4。默认场景中将包含一个摄像机和一个平行光，并使用内置的天空盒子。为便于查看效果，在Window->Rendering->Lighting Seting->Skybox中去掉场景中的天空盒子。
+2. 新建Shader(右键Create->Shader->UnitySurfaceShader)并命名为DiffuseVertexLevel；新建材质(右键Create->Material)并命名为DiffuseVertexLevelMat，将新建的Shader拖拽赋给新建材质。
+3.  在场景中新建一个胶囊体(菜单栏GameObject->3D Object->Capsule)，将其材质修改为新建材质。
+4. 保存场景。
 
 Shader实现：
 
@@ -109,7 +106,7 @@ Shader实现：
         SubShader{
             //顶点或者片元着色器的代码需要写在Pass语义块中
             Pass{
-
+    
                 Tags { "LightMode" = "ForwardBase"} //标签，用于定义该Pass在Unity的光照流水线中的角色
                 //接下来使用CGPROGRAM和ENDCG包围CG代码片，以定义最重要的顶点着色器和片元着色器代码
                 CGPROGRAM
@@ -178,12 +175,12 @@ Shader实现：
                 //开始CG代码片段
                 CGPROGRAM
                 //该代码片段的编译指令，例如
-
+    
                 #pragma vertex vert
                 #pragma fragment frag
                 
                 //CG代码写在此处
-
+    
                 ENDCG
             }
             //其他需要的Pass   
@@ -191,7 +188,7 @@ Shader实现：
         SubShader {
             //针对显卡B的SubShader
         }
-
+    
         //上述SubShader都失败后用于回调的Unity Shader
         FallBack "VertexLit"
     }
@@ -201,16 +198,15 @@ Shader实现：
 
 最终效果类似于下图：
 
-|![](illustrations/1_2.png)|
-|:---:|
+![](D:\wonderly321.github.io\assets\image\illustrations\1_2.png)
+
+
 
 准备工作：
 
-(1) 使用Scene_6_4和场景中添加的模型。
-
-(2) 新建Shader(右键Create->Shader->UnitySurfaceShader)并命名为DiffusePixelLevel；新建材质(右键Create->Material)并命名为DiffusePixelLevelMat，将新建的Shader拖拽赋给新建材质。
-
-(3) 保存场景。
+1. 使用Scene_6_4和场景中添加的模型。
+2. 新建Shader(右键Create->Shader->UnitySurfaceShader)并命名为DiffusePixelLevel；新建材质(右键Create->Material)并命名为DiffusePixelLevelMat，将新建的Shader拖拽赋给新建材质。
+3. 保存场景。
 
 Shader实现：
 
@@ -224,9 +220,9 @@ Shader实现：
                 CGPROGRAM
                 #pragma vertex vert
                 #pragma fragment frag
-
+    
                 #include "Lighting.cginc"
-
+    
                 fixed4 _Diffuse;
                 struct a2v {
                     float4 vertex : POSITION;
@@ -249,7 +245,7 @@ Shader实现：
                     fixed3 worldLightDir = normalize(_WorldSpaceLightPos0.xyz);
                     fixed3 diffuse = _LightColor0.rgb * _Diffuse.rgb * saturate(dot(worldNormal, worldLightDir));
                     fixed3 color = ambient + diffuse;
-
+    
                     return fixed4(color, 1.0);
                 }           
                 ENDCG
@@ -267,23 +263,20 @@ Shader实现：
 
 广义的半兰伯特光照模型公式如下：
 
-| ![](formulas/6_6.png)|
-|:--:|
+![](D:\wonderly321.github.io\assets\image\formulas\6_6.png)
 
-其主要特点是没有用max操作来防止点积为负，而是对其结果进行了α倍的缩放再加上一个β大小的偏移。一般都取0.5.
+
+其主要特点是没有用max操作来防止点积为负，而是对其结果进行了α倍的缩放再加上一个β大小的偏移。一般都取0.5。
 
 效果图：
 
-| ![](illustrations/1_3.png)|
-|:--:|
+ ![](D:\wonderly321.github.io\assets\image\illustrations\2_1.png)
 
 准备工作：
 
-(1) 使用Scene_6_4和场景中添加的胶囊模型。
-
-(2) 新建Shader(右键Create->Shader->UnitySurfaceShader)并命名为HalfLambert；新建材质(右键Create->Material)并命名为HalfLambertMat，将新建的Shader拖拽赋给新建材质。
-
-(3) 保存场景。
+1. 使用Scene_6_4和场景中添加的胶囊模型。
+2. 新建Shader(右键Create->Shader->UnitySurfaceShader)并命名为HalfLambert；新建材质(右键Create->Material)并命名为HalfLambertMat，将新建的Shader拖拽赋给新建材质。
+3. 保存场景。
 
 Shader实现：
 将DiffusePixelLevel Shader中的代码粘贴进去，然后修改为：
@@ -298,9 +291,9 @@ Shader实现：
                 CGPROGRAM
                 #pragma vertex vert
                 #pragma fragment frag
-
+    
                 #include "Lighting.cginc"
-
+    
                 fixed4 _Diffuse;
                 struct a2v {
                     float4 vertex : POSITION;
@@ -325,7 +318,7 @@ Shader实现：
                     fixed3 HalfLambert = dot(worldNormal, worldLightDir) * 0.5 + 0.5;
                     fixed3 diffuse = _LightColor0.rgb * _Diffuse.rgb * HalfLambert;
                     fixed3 color = ambient + diffuse;
-
+    
                     return fixed4(color, 1.0);
                 }           
                 ENDCG
@@ -338,9 +331,9 @@ Shader实现：
 
 最后，让我们看一下三种效果的对比吧 :p
 
-| ![](illustrations/1_1.png)  | ![](illustrations/1_2.png) | ![](illustrations/1_3.png) |
+| ![](D:\wonderly321.github.io\assets\image\illustrations\1_1.png) | ![](D:\wonderly321.github.io\assets\image\illustrations\1_2.png) | ![](D:\wonderly321.github.io\assets\image\illustrations\1_3.png) |
 |:----------:|:---:|:--------:|
-| 逐顶点反射  | 逐像素反射 | 半兰伯特反射| 
+| 逐顶点反射  | 逐像素反射 | 半兰伯特反射|
 
 
 ### 实践二 实现高光反射模型
@@ -357,31 +350,27 @@ Shader实现：
 
  首先给出基本光照模型中高光反射部分的计算公式
 
-|![](formulas/6_7.png)|
-|:--:|
+![](D:\wonderly321.github.io\assets\image\formulas\6_7.png)
 
- 从公式可以看出，要计算高光反射需要知道4个参数：入射光线的颜色和强度![](formulas/6_2.gif)，材质的漫反射系数![](formulas/6_8.png)，视角方向![](formulas/6_9.png)以及反射方向![](formulas/6_10.png)。其中反射方向![](formulas/6_10.png)可以由表面法线![](formulas/6_4.gif)和光源方向![](formulas/6_5.gif)计算出：
+ 从公式可以看出，要计算高光反射需要知道4个参数：入射光线的颜色和强度![](D:\wonderly321.github.io\assets\image\formulas\6_2.gif)，材质的漫反射系数![](D:\wonderly321.github.io\assets\image\formulas\6_8.png)，视角方向![](D:\wonderly321.github.io\assets\image\formulas\6_9.png)以及反射方向![](formulas/6_10.png)。其中反射方向![](D:\wonderly321.github.io\assets\image\formulas\6_10.png)可以由表面法线![](D:\wonderly321.github.io\assets\image\formulas\6_4.gif)和光源方向![](D:\wonderly321.github.io\assets\image\formulas\6_5.gif)计算出：
 
-![](formulas/6_11.png)
+![](D:\wonderly321.github.io\assets\image\formulas\6_11.png)
 
-此外，CG提供了计算反射方向的函数**Refect**可以直接使用
+此外，CG提供了计算反射方向的函数**Reflect**可以直接使用
 
 #### 逐顶点光照
 
  最终效果类似于下图：
 
- |![](illustrations/2_1.png)|
-|:--:|
+![](D:\wonderly321.github.io\assets\image\illustrations\2_1.png)
+
 
 准备工作：
 
-(1) 在Unity中新建一个场景，命名为Scene_6_5。默认场景中将包含一个摄像机和一个平行光，并使用内置的天空盒子。为便于查看效果，在Window->Rendering->Lighting Seting->Skybox中去掉场景中的天空盒子。
-
-(2) 新建Shader(右键Create->Shader->UnitySurfaceShader)并命名为SpecularVertexLevel；新建材质(右键Create->Material)并命名为SpecularVertexLevelMat，将新建的Shader拖拽赋给新建材质。
-
-(3) 在场景中新建一个胶囊体(菜单栏GameObject->3D Object->Capsule)，将其材质修改为新建材质。
-
-(4) 保存场景。
+1. 在Unity中新建一个场景，命名为Scene_6_5。默认场景中将包含一个摄像机和一个平行光，并使用内置的天空盒子。为便于查看效果，在Window->Rendering->Lighting Seting->Skybox中去掉场景中的天空盒子。
+2. 新建Shader(右键Create->Shader->UnitySurfaceShader)并命名为SpecularVertexLevel；新建材质(右键Create->Material)并命名为SpecularVertexLevelMat，将新建的Shader拖拽赋给新建材质。
+3.  在场景中新建一个胶囊体(菜单栏GameObject->3D Object->Capsule)，将其材质修改为新建材质。
+4. 保存场景。
 
 Shader实现：
 
@@ -397,9 +386,9 @@ Shader实现：
             Pass {           
                 // 只有定义了正确的LightMode才能得到一些Unity的内置光照变量
                 Tags{"LightMode" = "ForwardBase"}
-
+    
                 CGPROGRAM
-
+    
                 // 包含unity的内置的文件，才可以使用Unity内置的一些变量
                 #include "Lighting.cginc" 
                 #pragma vertex vert
@@ -408,19 +397,19 @@ Shader实现：
                 fixed4 _Diffuse;
                 fixed4 _Specular;
                 float _Gloss;
-
+    
                 struct a2v
                 {
                     float4 vertex : POSITION; // 告诉Unity把模型空间下的顶点坐标填充给vertex属性
                     float3 normal : NORMAL; // 告诉Unity把模型空间下的法线方向填充给normal属性
                 };
-
+    
                 struct v2f
                 {
                     float4 pos : SV_POSITION; // 声明用来存储顶点在裁剪空间下的坐标
                     float3 color : COLOR; // 用于传递计算出来的漫反射颜色
                 };
-
+    
                 // 计算顶点坐标从模型坐标系转换到裁剪面坐标系
                 v2f vert(a2v v)
                 {
@@ -441,19 +430,19 @@ Shader实现：
                     fixed3 viewDir = normalize(_WorldSpaceCameraPos.xyz - mul(unity_WorldToObject, v.vertex).xyz);
                     //高光反射
                     fixed3 specular = _LightColor0.rgb * pow(saturate(dot(reflectDir, viewDir)), _Gloss);
-
+    
                     // 最终颜色 = 漫反射 + 环境光 + 高光反射
                     o.color = diffuse + ambient + specular; // 颜色叠加用加法（亮度通常会增加）
-
+    
                     return o;
                 }
-
+    
                 // 计算每个像素点的颜色值
                 fixed4 frag(v2f i) : SV_Target 
                 {
                     return fixed4(i.color, 1);
                 }
-
+    
                 ENDCG
             }
             
@@ -477,16 +466,14 @@ Shader实现：
 
 最终效果类似于下图：
 
-|![](illustrations/2_2.png)|
-|:---:|
+![](D:\wonderly321.github.io\assets\image\illustrations\2_2.png)
+
 
 准备工作：
 
-(1) 使用Scene_6_5和场景中添加的模型。
-
-(2) 新建Shader(右键Create->Shader->UnitySurfaceShader)并命名为SpecularPixelLevel；新建材质(右键Create->Material)并命名为SpecularPixelLevelMat，将新建的Shader拖拽赋给新建材质。
-
-(3) 保存场景。
+1. 使用Scene_6_5和场景中添加的模型。
+2. 新建Shader(右键Create->Shader->UnitySurfaceShader)并命名为SpecularPixelLevel；新建材质(右键Create->Material)并命名为SpecularPixelLevelMat，将新建的Shader拖拽赋给新建材质。
+3.  保存场景。
 
 Shader实现：
 
@@ -500,9 +487,9 @@ Shader实现：
             Pass {           
                 // 只有定义了正确的LightMode才能得到一些Unity的内置光照变量
                 Tags{"LightMode" = "ForwardBase"}
-
+    
                 CGPROGRAM
-
+    
                 // 包含unity的内置的文件，才可以使用Unity内置的一些变量
                 #include "Lighting.cginc" 
                 #pragma vertex vert
@@ -511,20 +498,20 @@ Shader实现：
                 fixed4 _Diffuse;
                 fixed4 _Specular;
                 float _Gloss;
-
+    
                 struct a2v
                 {
                     float4 vertex : POSITION; // 告诉Unity把模型空间下的顶点坐标填充给vertex属性
                     float3 normal : NORMAL; // 告诉Unity把模型空间下的法线方向填充给normal属性
                 };
-
+    
                 struct v2f
                 {
                     float4 pos : SV_POSITION; // 声明用来存储顶点在裁剪空间下的坐标
                     float3 worldNormal : TEXCOORD0; 
                     float3 worldPos : TEXCOORD1;
                 };
-
+    
                 // 计算顶点坐标从模型坐标系转换到裁剪面坐标系
                 v2f vert(a2v v)
                 {
@@ -532,10 +519,10 @@ Shader实现：
                     o.pos = UnityObjectToClipPos(v.vertex); 
                     o.worldNormal = mul(v.normal, (float3x3)unity_WorldToObject); 
                     o.worldPos = mul(unity_WorldToObject, v.vertex).xyz; 
-
+    
                     return o;
                 }
-
+    
                 // 计算每个像素点的颜色值
                 fixed4 frag(v2f i) : SV_Target 
                 {
@@ -554,11 +541,11 @@ Shader实现：
                     fixed3 viewDir = normalize(_WorldSpaceCameraPos.xyz - i.worldPos.xyz);
                     //高光反射
                     fixed3 specular = _LightColor0.rgb * _Specular.rgb * pow(saturate(dot(reflectDir, viewDir)), _Gloss);
-
+    
                     // 最终颜色 = 漫反射 + 环境光 + 高光反射
                     return fixed4(diffuse + ambient + specular, 1.0); 
                 }
-
+    
                 ENDCG
             }
             
@@ -573,25 +560,23 @@ Shader实现：
 
 #### Blinn-Phong模型
 
-之前提到还有另一种高光反射的实现方法——Blinn模型。它引入了一个新的矢量![](formulas/6_12.png)，由对视角方向![](formulas/6_9.png)和光源方向![](formulas/6_5.gif)相加再归一化得到。
+之前提到还有另一种高光反射的实现方法——Blinn模型。它引入了一个新的矢量![](D:\wonderly321.github.io\assets\image\formulas\6_12.png)，由对视角方向![](D:\wonderly321.github.io\assets\image\formulas\6_9.png)和光源方向![](D:\wonderly321.github.io\assets\image\formulas\6_5.gif)相加再归一化得到。
 
-| ![](formulas/6_13.png)|
-|:--:|
+ ![](D:\wonderly321.github.io\assets\image\formulas\6_13.png)
+
 其计算公式如下：
-| ![](formulas/6_14.png)|
-|:--:|
+
+ ![](D:\wonderly321.github.io\assets\image\formulas\6_14.png)
+
 
 效果图：
-| ![](illustrations/2_3.png)|
-|:--:|
+ ![](D:\wonderly321.github.io\assets\image\illustrations\2_3.png)
 
 准备工作：
 
-(1) 使用Scene_6_4和场景中添加的胶囊模型。
-
-(2) 新建Shader(右键Create->Shader->UnitySurfaceShader)并命名为BlinnPhong；新建材质(右键Create->Material)并命名为BlinnPhongMat，将新建的Shader拖拽赋给新建材质。
-
-(3) 保存场景。
+1. 使用Scene_6_4和场景中添加的胶囊模型。
+2. 新建Shader(右键Create->Shader->UnitySurfaceShader)并命名为BlinnPhong；新建材质(右键Create->Material)并命名为BlinnPhongMat，将新建的Shader拖拽赋给新建材质。
+3. 保存场景。
 
 Shader实现：
 将SpecularPixelLevel Shader中的代码粘贴进去，然后修改为：
@@ -604,11 +589,11 @@ Shader实现：
         }
         SubShader{
             Pass {           
-
+    
                 Tags{"LightMode" = "ForwardBase"}
-
+    
                 CGPROGRAM
-
+    
                 #include "Lighting.cginc" 
                 #pragma vertex vert
                 #pragma fragment frag
@@ -616,30 +601,30 @@ Shader实现：
                 fixed4 _Diffuse; // 使用属性
                 fixed4 _Specular;
                 float _Gloss;
-
+    
                 struct a2v
                 {
                     float4 vertex : POSITION; 
                     float3 normal : NORMAL;   
                 };
-
+    
                 struct v2f
                 {
                     float4 pos : SV_POSITION;
                     float3 worldNormal : TEXCOORD0; 
                     float3 worldPos : TEXCOORD1;
                 };
-
+    
                 v2f vert(a2v v)
                 {
                     v2f o;
                     o.pos = UnityObjectToClipPos(v.vertex);
                     o.worldNormal = mul(v.normal, (float3x3)unity_WorldToObject); 
                     o.worldPos = mul(unity_WorldToObject, v.vertex).xyz; 
-
+    
                     return o;
                 }
-
+    
                 // 计算每个像素点的颜色值
                 fixed4 frag(v2f i) : SV_Target 
                 {
@@ -659,11 +644,11 @@ Shader实现：
                     fixed3 halfDir = normalize(worldLightDir + viewDir);
                     //高光反射
                     fixed3 specular = _LightColor0.rgb * _Specular.rgb * pow(max(dot(worldNormal, halfDir), 0), _Gloss);
-
+    
                     // 最终颜色 = 漫反射 + 环境光 + 高光反射
                     return fixed4(diffuse + ambient + specular, 1.0); 
                 }
-
+    
                 ENDCG
             }
             
@@ -674,9 +659,9 @@ Shader实现：
 
 最后，让我们看一下三种效果的对比吧 :p
 
-| ![](illustrations/2_1.png)  | ![](illustrations/2_2.png) | ![](illustrations/2_3.png) |
+| ![](D:\wonderly321.github.io\assets\image\illustrations\2_1.png) | ![](D:\wonderly321.github.io\assets\image\illustrations\2_2.png) | ![](D:\wonderly321.github.io\assets\image\illustrations\2_3.png) |
 |:----------:|:---:|:--------:|
-| 逐顶点反射  | 逐像素反射 | 半兰伯特反射| 
+| 逐顶点反射  | 逐像素反射 | 半兰伯特反射|
 
 评价：
 
@@ -700,7 +685,7 @@ p.s.： 使用时需归一化
         o.worldNormal = UnityObjectToWorldNormal(v.normal);
         
         ...
-
+    
     }
 
 #### 示例2
@@ -709,11 +694,11 @@ p.s.： 使用时需归一化
         ...
         
         fixed3 worldLightDir = normalize(UnityWorldSpaceLightDir(i.worldPos));
-
+    
         ...
-
+    
         fixed3 viewDir = normalize(UnityWorldSpaceViewDir(i.worldPos));
-
+    
         ...
     
     }
