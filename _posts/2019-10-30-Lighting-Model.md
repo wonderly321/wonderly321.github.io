@@ -197,15 +197,14 @@ Shader实现：
                 #pragma fragment frag
                 
                 //CG代码写在此处
-    
+
                 ENDCG
             }
             //其他需要的Pass   
         }
         SubShader {
             //针对显卡B的SubShader
-        }
-    
+        }    
         //上述SubShader都失败后用于回调的Unity Shader
         FallBack "VertexLit"
     }
@@ -471,10 +470,10 @@ Shader实现：
                 {
                     return fixed4(i.color, 1);
                 }
-    
+
                 ENDCG
-            }
-            
+
+            }          
         }
         FallBack "Specular"
     }
@@ -602,6 +601,7 @@ $$c_{specular} = (c_{light}· m_{specular})max(0, \hat n · \hat h)^{m_{gloss}} 
 
 
 效果图：
+
  ![]({{site.url}}\assets\image\illustrations\2_3.png)
 
 准备工作：
@@ -737,6 +737,8 @@ p.s.： 使用时需归一化
 
 ### 参考
 
-[Unity_Shaders_Book]: https://github.com/candycat1992/Unity_Shaders_Book
-[Unity Scripting Reference]: https://docs.unity3d.com/ScriptReference/index.html
+
+[Unity_Shaders_Book : https://github.com/candycat1992/Unity_Shaders_Book](https://github.com/candycat1992/Unity_Shaders_Book)
+
+[Unity Scripting Reference : https://docs.unity3d.com/ScriptReference/index.html](https://docs.unity3d.com/ScriptReference/index.html)
 
