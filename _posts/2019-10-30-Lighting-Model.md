@@ -8,7 +8,8 @@ author: "Wonder"
 meta: "Unity Shader"
 ---
 
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
+
 通常来讲，想要模拟真实的环境光照来生成一张图像需要考虑这样一种流程：首先，光线从**光源**中发射出来；然后，光线和场景中的一些物体相交，其中一部分光线被吸收，一部分被散射；最后，摄像机吸收了一些光，产生了一张图像。
 
 #### 光源
@@ -77,7 +78,7 @@ $$c_{diffuse} = (c_{light}·m_{diffuse})max(0, \hat n·I)$$
 
 
 
-从公式可以看出，要计算漫反射需要知道4个参数：入射光线的颜色和强度$c_{light}$，材质的漫反射系数$m_{diffuse}$，表面法线$\hat n$以及光源方向$I$。
+从公式可以看出，要计算漫反射需要知道4个参数：入射光线的颜色和强度 $c_{light}$ ，材质的漫反射系数 $m_{diffuse}$ ，表面法线$\hat n$以及光源方向 $I$ 。
 
 为防止点积结果为负值，需使用max操作，而CG提供的saturate函数可以达到同样的目的。
 
@@ -270,7 +271,7 @@ $$c_{diffuse} = (c_{light}·m_{diffuse})(\alpha(\hat n ·I) + \beta)$$
 
 
 
-其主要特点是没有用max操作来防止点积为负，而是对其结果进行了$\alpha$的缩放再加上一个$\beta$大小的偏移。一般都取0.5。
+其主要特点是没有用max操作来防止点积为负，而是对其结果进行了 $\alpha$ 的缩放再加上一个 $\beta$ 大小的偏移。一般都取0.5。
 
 效果图：
 
@@ -360,7 +361,7 @@ $$c_{specular} = (c_{light}·m_{specular})max(0, \hat v · r)$$
 
 
 
-从公式可以看出，要计算高光反射需要知道4个参数：入射光线的颜色和强度$c_{light}$，材质的漫反射系数$m_{specular}$，视角方向$\hat v$以及反射方向$r$。其中反射方向$r$可以由表面法线$\hat n $和光源方向$I$计算出：
+从公式可以看出，要计算高光反射需要知道4个参数：入射光线的颜色和强度 $c_{light}$ ，材质的漫反射系数 $m_{specular}$ ，视角方向 $\hat v$ 以及反射方向 $r$ 。其中反射方向 $r$ 可以由表面法线 $\hat n$ 和光源方向 $I$ 计算出：
 
 
 
@@ -572,7 +573,7 @@ Shader实现：
 
 #### Blinn-Phong模型
 
-之前提到还有另一种高光反射的实现方法——Blinn模型。它引入了一个新的矢量$\hat h$，由对视角方向$\hat v$和光源方向$I$相加再归一化得到:
+之前提到还有另一种高光反射的实现方法——Blinn模型。它引入了一个新的矢量 $\hat h$ ，由对视角方向 $\hat v$ 和光源方向 $I$ 相加再归一化得到:
 
 $$\hat h = \frac{\hat v + \hat I}{|\hat v + \hat I |}$$
 
