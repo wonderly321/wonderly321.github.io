@@ -86,7 +86,7 @@ $$c_{diffuse} = (c_{light}·m_{diffuse})max(0, \hat n·I)$$
 
 最终效果类似于下图：
 
- ![](..\assets\image\illustrations\1_1.png) 
+ ![]({{site.url}}\assets\image\illustrations\1_1.png) 
 
 准备工作：
 
@@ -199,7 +199,7 @@ Shader实现：
 
 最终效果类似于下图：
 
-![](..\assets\image\illustrations\1_2.png)
+![]({{site.url}}\assets\image\illustrations\1_2.png)
 
 
 
@@ -275,7 +275,7 @@ $$c_{diffuse} = (c_{light}·m_{diffuse})(\alpha(\hat n ·I) + \beta)$$
 
 效果图：
 
- ![](..\assets\image\illustrations\2_1.png)
+ ![]({{site.url}}\assets\image\illustrations\2_1.png)
 
 准备工作：
 
@@ -336,7 +336,7 @@ Shader实现：
 
 最后，让我们看一下三种效果的对比吧 :p
 
-| ![](..\assets\image\illustrations\1_1.png) | ![](..\assets\image\illustrations\1_2.png) | ![](..\assets\image\illustrations\1_3.png) |
+| ![]({{site.url}}\assets\image\illustrations\1_1.png) | ![]({{site.url}}\assets\image\illustrations\1_2.png) | ![]({{site.url}}\assets\image\illustrations\1_3.png) |
 |:----------:|:---:|:--------:|
 | 逐顶点反射  | 逐像素反射 | 半兰伯特反射|
 
@@ -375,7 +375,7 @@ $$r =2(\hat n · \hat I)\hat n - \hat I$$
 
  最终效果类似于下图：
 
-![](..\assets\image\illustrations\2_1.png)
+![]({{site.url}}\assets\image\illustrations\2_1.png)
 
 
 准备工作：
@@ -479,7 +479,7 @@ Shader实现：
 
 最终效果类似于下图：
 
-![](..\assets\image\illustrations\2_2.png)
+![]({{site.url}}\assets\image\illustrations\2_2.png)
 
 
 准备工作：
@@ -586,7 +586,7 @@ $$c_{specular} = (c_{light}· m_{specular})max(0, \hat n · \hat h)^{m_{gloss}} 
 
 
 效果图：
- ![](..\assets\image\illustrations\2_3.png)
+ ![]({{site.url}}\assets\image\illustrations\2_3.png)
 
 准备工作：
 
@@ -675,7 +675,7 @@ Shader实现：
 
 最后，让我们看一下三种效果的对比吧 :p
 
-| ![](..\assets\image\illustrations\2_1.png) | ![](..\assets\image\illustrations\2_2.png) | ![](..\assets\image\illustrations\2_3.png) |
+| ![]({{site.url}}\assets\image\illustrations\2_1.png) | ![]({{site.url}}\assets\image\illustrations\2_2.png) | ![]({{site.url}}\assets\image\illustrations\2_3.png) |
 |:----------:|:---:|:--------:|
 | 逐顶点反射  | 逐像素反射 | 半兰伯特反射|
 
