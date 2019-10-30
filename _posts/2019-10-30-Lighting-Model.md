@@ -1,32 +1,12 @@
 ---
 layout: page
 title: "Unity中的基础光照"
-tagline: "通常来讲，想要模拟真实的环境光照来生成一张图像需要考虑这样一种流程：首先，光线从光源中发射出来；然后，光线和场景中的一些物体相交，其中一部分光线被吸收，一部分被散射；最后，摄像机吸收了一些光，产生了一张图像"
 categories: shader
-image:
 author: "Wonder"
 meta: "Unity Shader"
 ---
 
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
- <script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  tex2jax: {
-    inlineMath: [['$','$'], ['\\(','\\)']],
-    processEscapes: true
-  }
-});
-</script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      tex2jax: {
-        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-      }
-    });
-</script>
-
-通常来讲，想要模拟真实的环境光照来生成一张图像需要考虑这样一种流程：首先，光线从**光源**中发射出来；然后，光线和场景中的一些物体相交，其中一部分光线被吸收，一部分被散射；最后，摄像机吸收了一些光，产生了一张图像。
+通常来讲，想要模拟真实的环境光照来生成一张图像需要考虑这样一种流程<!--more-->：首先，光线从**光源**中发射出来；然后，光线和场景中的一些物体相交，其中一部分光线被吸收，一部分被散射；最后，摄像机吸收了一些光，产生了一张图像。
 
 #### 光源
 
@@ -102,70 +82,72 @@ $$c_{diffuse} = (c_{light}·m_{diffuse})max(0, \hat n·I)$$
 
 最终效果类似于下图：
 
- ![]({{site.url}}\assets\image\illustrations\1_1.png) 
+ ![]({{site.url}}/assets/image/illustrations/1_1.png) 
 
 准备工作：
 
-1.  在Unity中新建一个场景，命名为Scene_6_4。默认场景中将包含一个摄像机和一个平行光，并使用内置的天空盒子。为便于查看效果，在Window->Rendering->Lighting Seting->Skybox中去掉场景中的天空盒子。
-2. 新建Shader(右键Create->Shader->UnitySurfaceShader)并命名为DiffuseVertexLevel；新建材质(右键Create->Material)并命名为DiffuseVertexLevelMat，将新建的Shader拖拽赋给新建材质。
-3.  在场景中新建一个胶囊体(菜单栏GameObject->3D Object->Capsule)，将其材质修改为新建材质。
+1.  在Unity中新建一个场景，命名为Scene_6_4。默认场景中将包含一个摄像机和一个平行光，并使用内置的天空盒子。为便于查看效果，在`Window->Rendering->Lighting Seting->Skybox`中去掉场景中的天空盒子。
+2. 新建Shader(右键`Create->Shader->UnitySurfaceShader`)并命名为DiffuseVertexLevel；新建材质(右键`Create->Material`)并命名为DiffuseVertexLevelMat，将新建的Shader拖拽赋给新建材质。
+3.  在场景中新建一个胶囊体(菜单栏`GameObject->3D Object->Capsule`)，将其材质修改为新建材质。
 4. 保存场景。
 
 Shader实现：
 
 打开新建的DiffuseVertexLevel(可以在VS Code中打开哦),删除所有已有代码并写入如下代码：
 
-    Shader "Custom/DiffuseVertexLevel"{
-        //声明属性
-        Properties{
-            _Diffuse ("Diffuse", Color) = (1, 1, 1, 1) //可在编辑器面板定义材质自身色彩
-        }
-        SubShader{
-            //顶点或者片元着色器的代码需要写在Pass语义块中
-            Pass{
-    
-                Tags { "LightMode" = "ForwardBase"} //标签，用于定义该Pass在Unity的光照流水线中的角色
-                //接下来使用CGPROGRAM和ENDCG包围CG代码片，以定义最重要的顶点着色器和片元着色器代码
-                CGPROGRAM
-                // #pragma指令告诉Unity定义的着色器的名字：vert 和 frag
-                #pragma vertex vert
-                #pragma fragment frag
-                //为使用Unity的一些内置变量，如_LightColor0
-                #include "Lighting.cginc" 
-                //定义与声明属性相匹配的变量，fixed精度，范围在0~1之间，表示材质的漫反射属性
-                fixed4 _Diffuse; 
-                //定义顶点着色器的输入输出结构体
-                //为访问顶点法线，在a2v中定义normal变量，为把顶点着色器中计算得到的光照颜色传递给片元着色器，在v2f中定义了一个color变量
-                struct a2v {
-                    float4 vertex : POSITION;
-                    float3 normal : NORMAL;
-                };
-                struct v2f{
-                    float4 pos : SV_POSITION;
-                    fixed3 color : COLOR;
-                };
-                //实现顶点着色器
-                v2f vert(a2v v){
-                    v2f o;
-                    o.pos = UnityObjectToClipPos(v.vertex);
-                    fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;
-                    fixed3 worldNormal = normalize(mul(v.normal, (float3x3)unity_WorldToObject));
-                    fixed3 worldLight = normalize(_WorldSpaceLightPos0.xyz);
-                    //漫反射颜色 = 直射光颜色 * max(0, cos(光源方向和法线方向夹角)) * 材质自身颜色
-                    //其中 max(0, cos(光源方向和法线方向夹角))部分可以改用半兰伯特光照模型以增强背光面的光照效果
-                    fixed3 diffuse = _LightColor0.rgb * _Diffuse.rgb * saturate(dot(worldNormal, worldLight));
-                    o.color = ambient + diffuse;
-                    return o;
-                }
-                //实现片元着色器
-                fixed4 frag(v2f i) : SV_Target {
-                    return fixed4(i.color, 1.0);
-                }           
-                ENDCG
-            }
-        }
-        Fallback "Diffuse"
+```glsl
+Shader "Custom/DiffuseVertexLevel"{
+    //声明属性
+    Properties{
+        _Diffuse ("Diffuse", Color) = (1, 1, 1, 1) //可在编辑器面板定义材质自身色彩
     }
+    SubShader{
+        //顶点或者片元着色器的代码需要写在Pass语义块中
+        Pass{
+
+            Tags { "LightMode" = "ForwardBase"} //标签，用于定义该Pass在Unity的光照流水线中的角色
+            //接下来使用CGPROGRAM和ENDCG包围CG代码片，以定义最重要的顶点着色器和片元着色器代码
+            CGPROGRAM
+            // #pragma指令告诉Unity定义的着色器的名字：vert 和 frag
+            #pragma vertex vert
+            #pragma fragment frag
+            //为使用Unity的一些内置变量，如_LightColor0
+            #include "Lighting.cginc" 
+            //定义与声明属性相匹配的变量，fixed精度，范围在0~1之间，表示材质的漫反射属性
+            fixed4 _Diffuse; 
+            //定义顶点着色器的输入输出结构体
+            //为访问顶点法线，在a2v中定义normal变量，为把顶点着色器中计算得到的光照颜色传递给片元着色器，在v2f中定义了一个color变量
+            struct a2v {
+                float4 vertex : POSITION;
+                float3 normal : NORMAL;
+            };
+            struct v2f{
+                float4 pos : SV_POSITION;
+                fixed3 color : COLOR;
+            };
+            //实现顶点着色器
+            v2f vert(a2v v){
+                v2f o;
+                o.pos = UnityObjectToClipPos(v.vertex);
+                fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;
+                fixed3 worldNormal = normalize(mul(v.normal, (float3x3)unity_WorldToObject));
+                fixed3 worldLight = normalize(_WorldSpaceLightPos0.xyz);
+                //漫反射颜色 = 直射光颜色 * max(0, cos(光源方向和法线方向夹角)) * 材质自身颜色
+                //其中 max(0, cos(光源方向和法线方向夹角))部分可以改用半兰伯特光照模型以增强背光面的光照效果
+                fixed3 diffuse = _LightColor0.rgb * _Diffuse.rgb * saturate(dot(worldNormal, worldLight));
+                o.color = ambient + diffuse;
+                return o;
+            }
+            //实现片元着色器
+            fixed4 frag(v2f i) : SV_Target {
+                return fixed4(i.color, 1.0);
+            }           
+            ENDCG
+        }
+    }
+    Fallback "Diffuse"
+}
+```
 
 因为要实现逐顶点的漫反射光照，所以最重要的是顶点着色器的实现：
 
@@ -180,95 +162,98 @@ Shader实现：
 
 另外，我们可以从代码中总结出Unity Shader的基本结构：
 
-    Shader "MyShaderName" {
-        Properties {
-            //属性
-        }
-        SubShader {
-            //针对显卡A的SubShader
-            Pass { 
-                //设置渲染状态和标签
-                
-                //开始CG代码片段
-                CGPROGRAM
-                //该代码片段的编译指令，例如
-    
-                #pragma vertex vert
-                #pragma fragment frag
-                
-                //CG代码写在此处
-
-                ENDCG
-            }
-            //其他需要的Pass   
-        }
-        SubShader {
-            //针对显卡B的SubShader
-        }    
-        //上述SubShader都失败后用于回调的Unity Shader
-        FallBack "VertexLit"
+```glsl
+Shader "MyShaderName" {
+    Properties {
+        //属性
     }
+    SubShader {
+        //针对显卡A的SubShader
+        Pass { 
+            //设置渲染状态和标签
+            
+            //开始CG代码片段
+            CGPROGRAM
+            //该代码片段的编译指令，例如
 
+            #pragma vertex vert
+            #pragma fragment frag
+            
+            //CG代码写在此处
+
+            ENDCG
+        }
+        //其他需要的Pass   
+    }
+    SubShader {
+        //针对显卡B的SubShader
+    }    
+    //上述SubShader都失败后用于回调的Unity Shader
+    FallBack "VertexLit"
+}
+```
 
 #### 逐像素光照
 
 最终效果类似于下图：
 
-![]({{site.url}}\assets\image\illustrations\1_2.png)
+![]({{site.url}}/assets/image/illustrations/1_2.png)
 
 
 
 准备工作：
 
 1. 使用Scene_6_4和场景中添加的模型。
-2. 新建Shader(右键Create->Shader->UnitySurfaceShader)并命名为DiffusePixelLevel；新建材质(右键Create->Material)并命名为DiffusePixelLevelMat，将新建的Shader拖拽赋给新建材质。
+2. 新建Shader(右键`Create->Shader->UnitySurfaceShader`)并命名为DiffusePixelLevel；新建材质(右键`Create->Material`)并命名为DiffusePixelLevelMat，将新建的Shader拖拽赋给新建材质。
 3. 保存场景。
 
 Shader实现：
 
-    Shader "Custom/DiffusePixelLevel"{
-        Properties{
-            _Diffuse ("Diffuse", Color) = (1, 1, 1, 1) 
-        }
-        SubShader{
-            Pass{
-                Tags { "LightMode" = "ForwardBase"}
-                CGPROGRAM
-                #pragma vertex vert
-                #pragma fragment frag
-    
-                #include "Lighting.cginc"
-    
-                fixed4 _Diffuse;
-                struct a2v {
-                    float4 vertex : POSITION;
-                    float3 normal : NORMAL;
-                };
-                struct v2f{
-                    float4 pos : SV_POSITION;
-                    fixed3 worldNormal : TEXCOORD0;
-                };
-                v2f vert(a2v v){
-                    v2f o;
-                    o.pos = UnityObjectToClipPos(v.vertex);
-                    
-                    o.worldNormal = mul(v.normal, (float3x3)unity_WorldToObject);
-                    return o;
-                }
-                fixed4 frag(v2f i) : SV_Target {
-                    fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;
-                    fixed3 worldNormal = normalize(i.worldNormal);
-                    fixed3 worldLightDir = normalize(_WorldSpaceLightPos0.xyz);
-                    fixed3 diffuse = _LightColor0.rgb * _Diffuse.rgb * saturate(dot(worldNormal, worldLightDir));
-                    fixed3 color = ambient + diffuse;
-    
-                    return fixed4(color, 1.0);
-                }           
-                ENDCG
-            }
-        }
-        Fallback "Diffuse"
+```glsl
+Shader "Custom/DiffusePixelLevel"{
+    Properties{
+        _Diffuse ("Diffuse", Color) = (1, 1, 1, 1) 
     }
+    SubShader{
+        Pass{
+            Tags { "LightMode" = "ForwardBase"}
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+
+            #include "Lighting.cginc"
+
+            fixed4 _Diffuse;
+            struct a2v {
+                float4 vertex : POSITION;
+                float3 normal : NORMAL;
+            };
+            struct v2f{
+                float4 pos : SV_POSITION;
+                fixed3 worldNormal : TEXCOORD0;
+            };
+            v2f vert(a2v v){
+                v2f o;
+                o.pos = UnityObjectToClipPos(v.vertex);
+                
+                o.worldNormal = mul(v.normal, (float3x3)unity_WorldToObject);
+                return o;
+            }
+            fixed4 frag(v2f i) : SV_Target {
+                fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;
+                fixed3 worldNormal = normalize(i.worldNormal);
+                fixed3 worldLightDir = normalize(_WorldSpaceLightPos0.xyz);
+                fixed3 diffuse = _LightColor0.rgb * _Diffuse.rgb * saturate(dot(worldNormal, worldLightDir));
+                fixed3 color = ambient + diffuse;
+
+                return fixed4(color, 1.0);
+            }           
+            ENDCG
+        }
+    }
+    Fallback "Diffuse"
+}
+```
 
 其结构与逐顶点的实现比较相似，只不过，计算光照的部分由放在顶点着色器修改到了片元着色器中。
 
@@ -290,68 +275,70 @@ $$c_{diffuse} = (c_{light}·m_{diffuse})(\alpha(\hat n ·I) + \beta)$$
 
 效果图：
 
- ![]({{site.url}}\assets\image\illustrations\2_1.png)
+ ![]({{site.url}}/assets/image/illustrations/2_1.png)
 
 准备工作：
 
 1. 使用Scene_6_4和场景中添加的胶囊模型。
-2. 新建Shader(右键Create->Shader->UnitySurfaceShader)并命名为HalfLambert；新建材质(右键Create->Material)并命名为HalfLambertMat，将新建的Shader拖拽赋给新建材质。
+2. 新建Shader(右键`Create->Shader->UnitySurfaceShader`)并命名为HalfLambert；新建材质(右键`Create->Material`)并命名为HalfLambertMat，将新建的Shader拖拽赋给新建材质。
 3. 保存场景。
 
 Shader实现：
 将DiffusePixelLevel Shader中的代码粘贴进去，然后修改为：
 
-    Shader "Custom/HalfLambert"{
-        Properties{
-            _Diffuse ("Diffuse", Color) = (1, 1, 1, 1)
-        }
-        SubShader{
-            Pass{
-                Tags { "LightMode" = "ForwardBase"}
-                CGPROGRAM
-                #pragma vertex vert
-                #pragma fragment frag
-    
-                #include "Lighting.cginc"
-    
-                fixed4 _Diffuse;
-                struct a2v {
-                    float4 vertex : POSITION;
-                    float3 normal : NORMAL;
-                };
-                struct v2f{
-                    float4 pos : SV_POSITION;
-                    fixed3 worldNormal : TEXCOORD0;
-                };
-                v2f vert(a2v v){
-                    v2f o;
-                    o.pos = UnityObjectToClipPos(v.vertex);
-                    
-                    o.worldNormal = mul(v.normal, (float3x3)unity_WorldToObject);
-                    return o;
-                }
-                fixed4 frag(v2f i) : SV_Target {
-                    fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;
-                    fixed3 worldNormal = normalize(i.worldNormal);
-                    fixed3 worldLightDir = normalize(_WorldSpaceLightPos0.xyz);
-                    //Compute diffuse term
-                    fixed3 HalfLambert = dot(worldNormal, worldLightDir) * 0.5 + 0.5;
-                    fixed3 diffuse = _LightColor0.rgb * _Diffuse.rgb * HalfLambert;
-                    fixed3 color = ambient + diffuse;
-    
-                    return fixed4(color, 1.0);
-                }           
-                ENDCG
-            }
-        }
-        Fallback "Diffuse"
+```glsl
+Shader "Custom/HalfLambert"{
+    Properties{
+        _Diffuse ("Diffuse", Color) = (1, 1, 1, 1)
     }
+    SubShader{
+        Pass{
+            Tags { "LightMode" = "ForwardBase"}
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+
+            #include "Lighting.cginc"
+
+            fixed4 _Diffuse;
+            struct a2v {
+                float4 vertex : POSITION;
+                float3 normal : NORMAL;
+            };
+            struct v2f{
+                float4 pos : SV_POSITION;
+                fixed3 worldNormal : TEXCOORD0;
+            };
+            v2f vert(a2v v){
+                v2f o;
+                o.pos = UnityObjectToClipPos(v.vertex);
+                
+                o.worldNormal = mul(v.normal, (float3x3)unity_WorldToObject);
+                return o;
+            }
+            fixed4 frag(v2f i) : SV_Target {
+                fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;
+                fixed3 worldNormal = normalize(i.worldNormal);
+                fixed3 worldLightDir = normalize(_WorldSpaceLightPos0.xyz);
+                //Compute diffuse term
+                fixed3 HalfLambert = dot(worldNormal, worldLightDir) * 0.5 + 0.5;
+                fixed3 diffuse = _LightColor0.rgb * _Diffuse.rgb * HalfLambert;
+                fixed3 color = ambient + diffuse;
+
+                return fixed4(color, 1.0);
+            }           
+            ENDCG
+        }
+    }
+    Fallback "Diffuse"
+}
+```
 
 重点是使用半兰伯特公式修改了片元着色器中计算漫反射光照的部分计算得出并使用了HalfLambert变量
 
 最后，让我们看一下三种效果的对比吧 :p
 
-| ![]({{site.url}}\assets\image\illustrations\1_1.png) | ![]({{site.url}}\assets\image\illustrations\1_2.png) | ![]({{site.url}}\assets\image\illustrations\1_3.png) |
+| ![]({{site.url}}/assets/image/illustrations/1_1.png) | ![]({{site.url}}/assets/image/illustrations/1_2.png) | ![]({{site.url}}/assets/image/illustrations/1_3.png) |
 |:----------:|:---:|:--------:|
 | 逐顶点反射  | 逐像素反射 | 半兰伯特反射|
 
@@ -390,93 +377,95 @@ $$r =2(\hat n · \hat I)\hat n - \hat I$$
 
  最终效果类似于下图：
 
-![]({{site.url}}\assets\image\illustrations\2_1.png)
+![]({{site.url}}/assets/image/illustrations/2_1.png)
 
 
 准备工作：
 
-1. 在Unity中新建一个场景，命名为Scene_6_5。默认场景中将包含一个摄像机和一个平行光，并使用内置的天空盒子。为便于查看效果，在Window->Rendering->Lighting Seting->Skybox中去掉场景中的天空盒子。
-2. 新建Shader(右键Create->Shader->UnitySurfaceShader)并命名为SpecularVertexLevel；新建材质(右键Create->Material)并命名为SpecularVertexLevelMat，将新建的Shader拖拽赋给新建材质。
-3.  在场景中新建一个胶囊体(菜单栏GameObject->3D Object->Capsule)，将其材质修改为新建材质。
+1. 在Unity中新建一个场景，命名为Scene_6_5。默认场景中将包含一个摄像机和一个平行光，并使用内置的天空盒子。为便于查看效果，在`Window->Rendering->Lighting Seting->Skybox`中去掉场景中的天空盒子。
+2. 新建Shader(右键`Create->Shader->UnitySurfaceShader`)并命名为SpecularVertexLevel；新建材质(右键`Create->Material`)并命名为SpecularVertexLevelMat，将新建的Shader拖拽赋给新建材质。
+3.  在场景中新建一个胶囊体(菜单栏`GameObject->3D Object->Capsule`)，将其材质修改为新建材质。
 4. 保存场景。
 
 Shader实现：
 
 打开新建的SpecularVertexLevel,删除所有已有代码并写入如下代码：
 
-    Shader "Custom/SpecularVertexLevel" { 
-        Properties{
-            _Diffuse("Diffuse Color", Color) = (1, 1, 1, 1) // 可在编辑器面板定义材质自身色彩
-            _Specular("Specular Color", Color) = (1, 1, 1, 1)
-            _Gloss("Gloss", Range(8.0, 256)) = 20 // 高光的参数
-        }
-        SubShader{
-            Pass {           
-                // 只有定义了正确的LightMode才能得到一些Unity的内置光照变量
-                Tags{"LightMode" = "ForwardBase"}
-    
-                CGPROGRAM
-    
-                // 包含unity的内置的文件，才可以使用Unity内置的一些变量
-                #include "Lighting.cginc" 
-                #pragma vertex vert
-                #pragma fragment frag
-    
-                fixed4 _Diffuse;
-                fixed4 _Specular;
-                float _Gloss;
-    
-                struct a2v
-                {
-                    float4 vertex : POSITION; // 告诉Unity把模型空间下的顶点坐标填充给vertex属性
-                    float3 normal : NORMAL; // 告诉Unity把模型空间下的法线方向填充给normal属性
-                };
-    
-                struct v2f
-                {
-                    float4 pos : SV_POSITION; // 声明用来存储顶点在裁剪空间下的坐标
-                    float3 color : COLOR; // 用于传递计算出来的漫反射颜色
-                };
-    
-                // 计算顶点坐标从模型坐标系转换到裁剪面坐标系
-                v2f vert(a2v v)
-                {
-                    v2f o;
-                    o.pos = UnityObjectToClipPos(v.vertex);
-                    // 环境光
-                    fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;
-                    // 法线方向
-                    fixed3 worldNormal = normalize(mul(v.normal, (float3x3)unity_WorldToObject));
-                    // 光源方向
-                    fixed3 worldLightDir = normalize(_WorldSpaceLightPos0.xyz); 
-                    //漫反射
-                    fixed3 diffuse = _LightColor0.rgb * _Diffuse.rgb * saturate(dot(worldNormal, worldLightDir)) ; 
-                    
-                    // 反射方向
-                    fixed3 reflectDir = normalize(reflect(-worldLightDir, worldNormal));
-                    // 视角方向
-                    fixed3 viewDir = normalize(_WorldSpaceCameraPos.xyz - mul(unity_WorldToObject, v.vertex).xyz);
-                    //高光反射
-                    fixed3 specular = _LightColor0.rgb * pow(saturate(dot(reflectDir, viewDir)), _Gloss);
-    
-                    // 最终颜色 = 漫反射 + 环境光 + 高光反射
-                    o.color = diffuse + ambient + specular; // 颜色叠加用加法（亮度通常会增加）
-    
-                    return o;
-                }
-    
-                // 计算每个像素点的颜色值
-                fixed4 frag(v2f i) : SV_Target 
-                {
-                    return fixed4(i.color, 1);
-                }
-
-                ENDCG
-
-            }          
-        }
-        FallBack "Specular"
+```glsl
+Shader "Custom/SpecularVertexLevel" { 
+    Properties{
+        _Diffuse("Diffuse Color", Color) = (1, 1, 1, 1) // 可在编辑器面板定义材质自身色彩
+        _Specular("Specular Color", Color) = (1, 1, 1, 1)
+        _Gloss("Gloss", Range(8.0, 256)) = 20 // 高光的参数
     }
+    SubShader{
+        Pass {           
+            // 只有定义了正确的LightMode才能得到一些Unity的内置光照变量
+            Tags{"LightMode" = "ForwardBase"}
+
+            CGPROGRAM
+
+            // 包含unity的内置的文件，才可以使用Unity内置的一些变量
+            #include "Lighting.cginc" 
+            #pragma vertex vert
+            #pragma fragment frag
+
+            fixed4 _Diffuse;
+            fixed4 _Specular;
+            float _Gloss;
+
+            struct a2v
+            {
+                float4 vertex : POSITION; // 告诉Unity把模型空间下的顶点坐标填充给vertex属性
+                float3 normal : NORMAL; // 告诉Unity把模型空间下的法线方向填充给normal属性
+            };
+
+            struct v2f
+            {
+                float4 pos : SV_POSITION; // 声明用来存储顶点在裁剪空间下的坐标
+                float3 color : COLOR; // 用于传递计算出来的漫反射颜色
+            };
+
+            // 计算顶点坐标从模型坐标系转换到裁剪面坐标系
+            v2f vert(a2v v)
+            {
+                v2f o;
+                o.pos = UnityObjectToClipPos(v.vertex);
+                // 环境光
+                fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;
+                // 法线方向
+                fixed3 worldNormal = normalize(mul(v.normal, (float3x3)unity_WorldToObject));
+                // 光源方向
+                fixed3 worldLightDir = normalize(_WorldSpaceLightPos0.xyz); 
+                //漫反射
+                fixed3 diffuse = _LightColor0.rgb * _Diffuse.rgb * saturate(dot(worldNormal, worldLightDir)) ; 
+                
+                // 反射方向
+                fixed3 reflectDir = normalize(reflect(-worldLightDir, worldNormal));
+                // 视角方向
+                fixed3 viewDir = normalize(_WorldSpaceCameraPos.xyz - mul(unity_WorldToObject, v.vertex).xyz);
+                //高光反射
+                fixed3 specular = _LightColor0.rgb * pow(saturate(dot(reflectDir, viewDir)), _Gloss);
+
+                // 最终颜色 = 漫反射 + 环境光 + 高光反射
+                o.color = diffuse + ambient + specular; // 颜色叠加用加法（亮度通常会增加）
+
+                return o;
+            }
+
+            // 计算每个像素点的颜色值
+            fixed4 frag(v2f i) : SV_Target 
+            {
+                return fixed4(i.color, 1);
+            }
+
+            ENDCG
+
+        }          
+    }
+    FallBack "Specular"
+}
+```
 
 需要注意：
 
@@ -494,92 +483,94 @@ Shader实现：
 
 最终效果类似于下图：
 
-![]({{site.url}}\assets\image\illustrations\2_2.png)
+![]({{site.url}}/assets/image/illustrations/2_2.png)
 
 
 准备工作：
 
 1. 使用Scene_6_5和场景中添加的模型。
-2. 新建Shader(右键Create->Shader->UnitySurfaceShader)并命名为SpecularPixelLevel；新建材质(右键Create->Material)并命名为SpecularPixelLevelMat，将新建的Shader拖拽赋给新建材质。
+2. 新建Shader(右键`Create->Shader->UnitySurfaceShader`)并命名为SpecularPixelLevel；新建材质(右键`Create->Material`)并命名为SpecularPixelLevelMat，将新建的Shader拖拽赋给新建材质。
 3.  保存场景。
 
 Shader实现：
 
-    Shader "Custom/SpecularPixelLevel" { 
-        Properties{
-            _Diffuse("Diffuse Color", Color) = (1, 1, 1, 1) 
-            _Specular("Specular Color", Color) = (1, 1, 1, 1)
-            _Gloss("Gloss", Range(8.0, 256)) = 20 // 高光的参数
-        }
-        SubShader{
-            Pass {           
-                // 只有定义了正确的LightMode才能得到一些Unity的内置光照变量
-                Tags{"LightMode" = "ForwardBase"}
-    
-                CGPROGRAM
-    
-                // 包含unity的内置的文件，才可以使用Unity内置的一些变量
-                #include "Lighting.cginc" 
-                #pragma vertex vert
-                #pragma fragment frag
-    
-                fixed4 _Diffuse;
-                fixed4 _Specular;
-                float _Gloss;
-    
-                struct a2v
-                {
-                    float4 vertex : POSITION; // 告诉Unity把模型空间下的顶点坐标填充给vertex属性
-                    float3 normal : NORMAL; // 告诉Unity把模型空间下的法线方向填充给normal属性
-                };
-    
-                struct v2f
-                {
-                    float4 pos : SV_POSITION; // 声明用来存储顶点在裁剪空间下的坐标
-                    float3 worldNormal : TEXCOORD0; 
-                    float3 worldPos : TEXCOORD1;
-                };
-    
-                // 计算顶点坐标从模型坐标系转换到裁剪面坐标系
-                v2f vert(a2v v)
-                {
-                    v2f o;
-                    o.pos = UnityObjectToClipPos(v.vertex); 
-                    o.worldNormal = mul(v.normal, (float3x3)unity_WorldToObject); 
-                    o.worldPos = mul(unity_WorldToObject, v.vertex).xyz; 
-    
-                    return o;
-                }
-    
-                // 计算每个像素点的颜色值
-                fixed4 frag(v2f i) : SV_Target 
-                {
-                    // 环境光
-                    fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;
-                    // 法线方向
-                    fixed3 worldNormal = normalize(i.worldNormal); 
-                    // 光源方向
-                    fixed3 worldLightDir = normalize(_WorldSpaceLightPos0.xyz); 
-                    //漫反射
-                    fixed3 diffuse = _LightColor0.rgb * _Diffuse.rgb * saturate(dot(worldNormal, worldLightDir)) ;
-                    
-                    // 反射光的方向
-                    fixed3 reflectDir = normalize(reflect(-worldLightDir, worldNormal));
-                    // 视角方向
-                    fixed3 viewDir = normalize(_WorldSpaceCameraPos.xyz - i.worldPos.xyz);
-                    //高光反射
-                    fixed3 specular = _LightColor0.rgb * _Specular.rgb * pow(saturate(dot(reflectDir, viewDir)), _Gloss);
-    
-                    // 最终颜色 = 漫反射 + 环境光 + 高光反射
-                    return fixed4(diffuse + ambient + specular, 1.0); 
-                }
-    
-                ENDCG
-            }
-            
-        }
-        FallBack "Specular"
+```glsl
+Shader "Custom/SpecularPixelLevel" { 
+    Properties{
+        _Diffuse("Diffuse Color", Color) = (1, 1, 1, 1) 
+        _Specular("Specular Color", Color) = (1, 1, 1, 1)
+        _Gloss("Gloss", Range(8.0, 256)) = 20 // 高光的参数
     }
+    SubShader{
+        Pass {           
+            // 只有定义了正确的LightMode才能得到一些Unity的内置光照变量
+            Tags{"LightMode" = "ForwardBase"}
+
+            CGPROGRAM
+
+            // 包含unity的内置的文件，才可以使用Unity内置的一些变量
+            #include "Lighting.cginc" 
+            #pragma vertex vert
+            #pragma fragment frag
+
+            fixed4 _Diffuse;
+            fixed4 _Specular;
+            float _Gloss;
+
+            struct a2v
+            {
+                float4 vertex : POSITION; // 告诉Unity把模型空间下的顶点坐标填充给vertex属性
+                float3 normal : NORMAL; // 告诉Unity把模型空间下的法线方向填充给normal属性
+            };
+
+            struct v2f
+            {
+                float4 pos : SV_POSITION; // 声明用来存储顶点在裁剪空间下的坐标
+                float3 worldNormal : TEXCOORD0; 
+                float3 worldPos : TEXCOORD1;
+            };
+
+            // 计算顶点坐标从模型坐标系转换到裁剪面坐标系
+            v2f vert(a2v v)
+            {
+                v2f o;
+                o.pos = UnityObjectToClipPos(v.vertex); 
+                o.worldNormal = mul(v.normal, (float3x3)unity_WorldToObject); 
+                o.worldPos = mul(unity_WorldToObject, v.vertex).xyz; 
+
+                return o;
+            }
+
+            // 计算每个像素点的颜色值
+            fixed4 frag(v2f i) : SV_Target 
+            {
+                // 环境光
+                fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;
+                // 法线方向
+                fixed3 worldNormal = normalize(i.worldNormal); 
+                // 光源方向
+                fixed3 worldLightDir = normalize(_WorldSpaceLightPos0.xyz); 
+                //漫反射
+                fixed3 diffuse = _LightColor0.rgb * _Diffuse.rgb * saturate(dot(worldNormal, worldLightDir)) ;
+                
+                // 反射光的方向
+                fixed3 reflectDir = normalize(reflect(-worldLightDir, worldNormal));
+                // 视角方向
+                fixed3 viewDir = normalize(_WorldSpaceCameraPos.xyz - i.worldPos.xyz);
+                //高光反射
+                fixed3 specular = _LightColor0.rgb * _Specular.rgb * pow(saturate(dot(reflectDir, viewDir)), _Gloss);
+
+                // 最终颜色 = 漫反射 + 环境光 + 高光反射
+                return fixed4(diffuse + ambient + specular, 1.0); 
+            }
+
+            ENDCG
+        }
+        
+    }
+    FallBack "Specular"
+}
+```
 
 其结构与逐顶点的实现比较相似，只不过，计算光照的部分由放在顶点着色器修改到了片元着色器中。
 
@@ -590,7 +581,7 @@ Shader实现：
 
 之前提到还有另一种高光反射的实现方法——Blinn模型。它引入了一个新的矢量 $\hat h$ ，由对视角方向 $\hat v$ 和光源方向 $I$ 相加再归一化得到:
 
-$$\hat h = \frac{\hat v + \hat I}{|\hat v + \hat I |}$$
+$$\hat h = /frac{\hat v + \hat I}{|\hat v + \hat I |}$$
 
 
 
@@ -602,96 +593,97 @@ $$c_{specular} = (c_{light}· m_{specular})max(0, \hat n · \hat h)^{m_{gloss}} 
 
 效果图：
 
- ![]({{site.url}}\assets\image\illustrations\2_3.png)
+ ![]({{site.url}}/assets/image/illustrations/2_3.png)
 
 准备工作：
 
 1. 使用Scene_6_4和场景中添加的胶囊模型。
-2. 新建Shader(右键Create->Shader->UnitySurfaceShader)并命名为BlinnPhong；新建材质(右键Create->Material)并命名为BlinnPhongMat，将新建的Shader拖拽赋给新建材质。
+2. 新建Shader(右键`Create->Shader->UnitySurfaceShader`)并命名为BlinnPhong；新建材质(右键`Create->Material`)并命名为BlinnPhongMat，将新建的Shader拖拽赋给新建材质。
 3. 保存场景。
 
 Shader实现：
 将SpecularPixelLevel Shader中的代码粘贴进去，然后修改为：
 
-    Shader "Custom/BlinnPhong" { 
-        Properties{
-            _Diffuse("Diffuse Color", Color) = (1, 1, 1, 1) 
-            _Specular("Specular Color", Color) = (1, 1, 1, 1)
-            _Gloss("Gloss", Range(8.0, 256)) = 20 
-        }
-        SubShader{
-            Pass {           
-    
-                Tags{"LightMode" = "ForwardBase"}
-    
-                CGPROGRAM
-    
-                #include "Lighting.cginc" 
-                #pragma vertex vert
-                #pragma fragment frag
-    
-                fixed4 _Diffuse; // 使用属性
-                fixed4 _Specular;
-                float _Gloss;
-    
-                struct a2v
-                {
-                    float4 vertex : POSITION; 
-                    float3 normal : NORMAL;   
-                };
-    
-                struct v2f
-                {
-                    float4 pos : SV_POSITION;
-                    float3 worldNormal : TEXCOORD0; 
-                    float3 worldPos : TEXCOORD1;
-                };
-    
-                v2f vert(a2v v)
-                {
-                    v2f o;
-                    o.pos = UnityObjectToClipPos(v.vertex);
-                    o.worldNormal = mul(v.normal, (float3x3)unity_WorldToObject); 
-                    o.worldPos = mul(unity_WorldToObject, v.vertex).xyz; 
-    
-                    return o;
-                }
-    
-                // 计算每个像素点的颜色值
-                fixed4 frag(v2f i) : SV_Target 
-                {
-                    // 环境光
-                    fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;
-                    // 法线方向
-                    fixed3 worldNormal = normalize(i.worldNormal); 
-                    // 光照方向
-                    fixed3 worldLightDir = normalize(_WorldSpaceLightPos0.xyz);
-                    //漫反射
-                    fixed3 diffuse = _LightColor0.rgb * _Diffuse.rgb * saturate(dot(worldNormal, worldLightDir)) ;
-                    
-                    // 反射光的方向
-                    fixed3 reflectDir = normalize(reflect(-worldLightDir, worldNormal)); 
-                    // 视野方向
-                    fixed3 viewDir = normalize(_WorldSpaceCameraPos.xyz - i.worldPos.xyz);
-                    fixed3 halfDir = normalize(worldLightDir + viewDir);
-                    //高光反射
-                    fixed3 specular = _LightColor0.rgb * _Specular.rgb * pow(max(dot(worldNormal, halfDir), 0), _Gloss);
-    
-                    // 最终颜色 = 漫反射 + 环境光 + 高光反射
-                    return fixed4(diffuse + ambient + specular, 1.0); 
-                }
-    
-                ENDCG
-            }
-            
-        }
-        FallBack "Specular"
+```glsl
+Shader "Custom/BlinnPhong" { 
+    Properties{
+        _Diffuse("Diffuse Color", Color) = (1, 1, 1, 1) 
+        _Specular("Specular Color", Color) = (1, 1, 1, 1)
+        _Gloss("Gloss", Range(8.0, 256)) = 20 
     }
+    SubShader{
+        Pass {           
 
+            Tags{"LightMode" = "ForwardBase"}
+
+            CGPROGRAM
+
+            #include "Lighting.cginc" 
+            #pragma vertex vert
+            #pragma fragment frag
+
+            fixed4 _Diffuse; // 使用属性
+            fixed4 _Specular;
+            float _Gloss;
+
+            struct a2v
+            {
+                float4 vertex : POSITION; 
+                float3 normal : NORMAL;   
+            };
+
+            struct v2f
+            {
+                float4 pos : SV_POSITION;
+                float3 worldNormal : TEXCOORD0; 
+                float3 worldPos : TEXCOORD1;
+            };
+
+            v2f vert(a2v v)
+            {
+                v2f o;
+                o.pos = UnityObjectToClipPos(v.vertex);
+                o.worldNormal = mul(v.normal, (float3x3)unity_WorldToObject); 
+                o.worldPos = mul(unity_WorldToObject, v.vertex).xyz; 
+
+                return o;
+            }
+
+            // 计算每个像素点的颜色值
+            fixed4 frag(v2f i) : SV_Target 
+            {
+                // 环境光
+                fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;
+                // 法线方向
+                fixed3 worldNormal = normalize(i.worldNormal); 
+                // 光照方向
+                fixed3 worldLightDir = normalize(_WorldSpaceLightPos0.xyz);
+                //漫反射
+                fixed3 diffuse = _LightColor0.rgb * _Diffuse.rgb * saturate(dot(worldNormal, worldLightDir)) ;
+                
+                // 反射光的方向
+                fixed3 reflectDir = normalize(reflect(-worldLightDir, worldNormal)); 
+                // 视野方向
+                fixed3 viewDir = normalize(_WorldSpaceCameraPos.xyz - i.worldPos.xyz);
+                fixed3 halfDir = normalize(worldLightDir + viewDir);
+                //高光反射
+                fixed3 specular = _LightColor0.rgb * _Specular.rgb * pow(max(dot(worldNormal, halfDir), 0), _Gloss);
+
+                // 最终颜色 = 漫反射 + 环境光 + 高光反射
+                return fixed4(diffuse + ambient + specular, 1.0); 
+            }
+
+            ENDCG
+        }
+        
+    }
+    FallBack "Specular"
+}
+```
 
 最后，让我们看一下三种效果的对比吧 :p
 
-| ![]({{site.url}}\assets\image\illustrations\2_1.png) | ![]({{site.url}}\assets\image\illustrations\2_2.png) | ![]({{site.url}}\assets\image\illustrations\2_3.png) |
+| ![]({{site.url}}/assets/image/illustrations/2_1.png) | ![]({{site.url}}/assets/image/illustrations/2_2.png) | ![]({{site.url}}/assets/image/illustrations/2_3.png) |
 |:----------:|:---:|:--------:|
 | 逐顶点反射  | 逐像素反射 | 半兰伯特反射|
 

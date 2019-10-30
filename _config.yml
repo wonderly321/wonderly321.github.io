@@ -3,7 +3,7 @@ image: /avatar.jpg
 description: Wonder wants to be a TA.
 show_downloads: true
 
-baseurl: "" # change this to the subpath of your site, e.g. /blog. Leave it empty if you don't need it.
+baseurl:  # change this to the subpath of your site, e.g. /blog. Leave it empty if you don't need it.
 url: "https://wonderly321.github.io" # change this to the base hostname & protocol for your site
 
 
@@ -23,7 +23,6 @@ mail: wonderly321@gmail.com
 # Comment
 comment:
     disqus: vno-jekyll
-    # duoshuo:
 
 plugins:
   - jekyll-target-blank
