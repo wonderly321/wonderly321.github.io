@@ -11,40 +11,52 @@ meta: "Unity Shader"
 <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
 
 ### 引题
+
 通常来讲，想要模拟真实的环境光照来生成一张图像需要考虑这样一种流程：首先，光线从**光源**中发射出来；然后，光线和场景中的一些物体相交，其中一部分光线被吸收，一部分被散射；最后，摄像机吸收了一些光，产生了一张图像
 
 #### 光源
+
 在实时渲染中，光源可以看作是一个没有体积的点，用l表示其方向，用**辐射度(irradiance)** 来量化。比如平行光，其辐射度可通过计算在垂直于l的单位面积上单位时间内穿过的能量来得到。而计算物体表面的辐射度，可以利用光源方向l和表面法线n之间的夹角的余弦值来得到。（ps. 方向矢量默认模长为1）。实际计算中，辐射度与cosθ成正比，所以使用**点积**来计算。
 #### 吸收与散射
+
 光源与物体相交的结果有两个：**散射**和**吸收**。散射只改变光线方向，不改变光线密度和颜色，而吸收相反。光线在物体表面的散射又分为折射（或说透射）和反射两种。光照模型中，**高光反射**属性表示物体表面的反射，**漫反射**属性表示物体表面的折射，吸收和散射。**出射度**用来描述出射光线的数量和方向。辐射度与出射度的比值也就是材质的漫反射和高光属性。
 
 #### 着色
+
 着色是指根据材质属性，光源信息，使用一个等式去计算沿着某观察方向的出射度的过程。此等式就是**光照模型(Lighting Model)**.
 
 #### BRDF光照模型
+
 BRDF全称**Bidirectional Reflectance Distribution Function**。当给定模型表面一个点时，BRDF包含了对该点外观的完整描述。在给出入射光线和辐射度时，BRDF可以给出在某个出射方向上的光照能量分布。由于它是理想和简化后的模型，它并不能真实反映物体和光线的交互，故作为经验模型。
 此时不得不说一句计算机图形学第一定律：如果它看起来是对的，那么它就是对的。
 
 ### 标准光照模型
+
 标准光照模型的基本方法将进入到摄像机内的光线分为4部分：
+
  - **自发光(emissive)**：描述当给定一个方向时，一个表面本身会向该方向发射多少辐射量。
  - **高光反射(specular)**：描述当光线从光源照射到模型表面时，该表面会在完全镜面反射方向上辐射出多少辐射量。
  - **漫反射(diffuse)**：描述当光线从光源照射到模型表面时，该表面会向每个方向散射多少辐射量。
  - **环境光(ambient)**：描述其他所有的间接光照。
 
 #### 环境光
+
  间接光照是指光线在进入摄像机之前经过了多次物体的反射。在标准光照模型中，使用一种被称为**环境光**的部分来近似间接光照。
 
 ### 自发光
+
  自发光是指光线没有经过任何反射之间进入到摄像机中。标准光照模型使用**自发光（颜色）**来计算这个部分的贡献，但该物体并不被当成一个光源，去照亮周围的其他表面。
 
 ### 漫反射
+
  漫反射光照符合**兰伯特定律(Lambert's Law)**,反射强度与表面法线和光源方向之间的夹角的余弦值成正比
 
 ### 高光反射
+
  高光可以使得物体具有金属的材质。一般采用**Phong模型**或者**Blinn模型**去计算，其中Blinn模型在摄像机和光源距离够远时会快于Phong模型。两者都是经验模型
 
 ### 逐像素/逐顶点
+
  通常来讲，在片元着色器中计算光照被称为逐像素光照，而在顶点着色器中计算被称为逐顶点光照。逐像素光照以每个像素为基础得到其法线，然后计算光照模型，又称**Phong着色(Phong Shading,不同于Phong光照模型)**。逐顶点光照又称为**高洛德着色**，它在每个顶点上计算光照，在渲染图元内部进行线性插值，输出成像素颜色。很显然其计算量小于逐像素着色，但由于使用线性插值，将导致明显的棱角现象。
 
 ### 实践一 实现漫反射光照模型
@@ -58,12 +70,14 @@ BRDF全称**Bidirectional Reflectance Distribution Function**。当给定模型�
     [Unity_Shader_GetIn](https://github.com/wonderly321/Unity_Shader_GetIn)
 
 #### 计算公式
+
  首先给出基本光照模型中漫反射部分的计算公式
 
 |![](formulas/6_1.gif)|
 |:--:|
 
  从公式可以看出，要计算漫反射需要知道4个参数：入射光线的颜色和强度![](formulas/6_2.gif)，材质的漫反射系数![](formulas/6_3.gif)，表面法线![](formulas/6_4.gif)以及光源方向![](formulas/6_5.gif)。
+
  为防止点积结果为负值，需使用max操作，而CG提供的saturate函数可以达到同样的目的。
 
 #### 逐顶点光照
@@ -76,8 +90,11 @@ BRDF全称**Bidirectional Reflectance Distribution Function**。当给定模型�
 
 准备工作：
 (1) 在Unity中新建一个场景，命名为Scene_6_4。默认场景中将包含一个摄像机和一个平行光，并使用内置的天空盒子。为便于查看效果，在Window->Rendering->Lighting Seting->Skybox中去掉场景中的天空盒子。
+
 (2) 新建Shader(右键Create->Shader->UnitySurfaceShader)并命名为DiffuseVertexLevel；新建材质(右键Create->Material)并命名为DiffuseVertexLevelMat，将新建的Shader拖拽赋给新建材质。
+
 (3) 在场景中新建一个胶囊体(菜单栏GameObject->3D Object->Capsule)，将其材质修改为新建材质。
+
 (4) 保存场景。
 
 Shader实现：
@@ -137,6 +154,7 @@ Shader实现：
     }
 
 因为要实现逐顶点的漫反射光照，所以最重要的是顶点着色器的实现：
+
 - 首先定义返回值o;
 - 使用Unity内置矩阵UnityObjectToClipPos完成顶点位置从模型空间到裁剪空间的转换；
 - 通过UNITY_LIGHTMODEL_AMBIENT得到环境光部分；
@@ -189,7 +207,9 @@ Shader实现：
 准备工作：
 
 (1) 使用Scene_6_4和场景中添加的模型。
+
 (2) 新建Shader(右键Create->Shader->UnitySurfaceShader)并命名为DiffusePixelLevel；新建材质(右键Create->Material)并命名为DiffusePixelLevelMat，将新建的Shader拖拽赋给新建材质。
+
 (3) 保存场景。
 
 Shader实现：
@@ -249,16 +269,20 @@ Shader实现：
 
 | ![](formulas/6_6.png)|
 |:--:|
+
 其主要特点是没有用max操作来防止点积为负，而是对其结果进行了α倍的缩放再加上一个β大小的偏移。一般都取0.5.
 
 效果图：
+
 | ![](illustrations/1_3.png)|
 |:--:|
 
 准备工作：
 
 (1) 使用Scene_6_4和场景中添加的胶囊模型。
+
 (2) 新建Shader(右键Create->Shader->UnitySurfaceShader)并命名为HalfLambert；新建材质(右键Create->Material)并命名为HalfLambertMat，将新建的Shader拖拽赋给新建材质。
+
 (3) 保存场景。
 
 Shader实现：
@@ -319,7 +343,7 @@ Shader实现：
 | 逐顶点反射  | 逐像素反射 | 半兰伯特反射| 
 
 
- ### 实践二 实现高光反射模型
+### 实践二 实现高光反射模型
 
  - 运行平台：
 
@@ -329,7 +353,8 @@ Shader实现：
 
     [Unity_Shader_GetIn](https://github.com/wonderly321/Unity_Shader_GetIn)
 
- #### 计算公式
+#### 计算公式
+
  首先给出基本光照模型中高光反射部分的计算公式
 
 |![](formulas/6_7.png)|
@@ -341,18 +366,21 @@ Shader实现：
 
 此外，CG提供了计算反射方向的函数**Refect**可以直接使用
 
- #### 逐顶点光照
+#### 逐顶点光照
 
  最终效果类似于下图：
 
  |![](illustrations/2_1.png)|
 |:--:|
 
-
 准备工作：
+
 (1) 在Unity中新建一个场景，命名为Scene_6_5。默认场景中将包含一个摄像机和一个平行光，并使用内置的天空盒子。为便于查看效果，在Window->Rendering->Lighting Seting->Skybox中去掉场景中的天空盒子。
+
 (2) 新建Shader(右键Create->Shader->UnitySurfaceShader)并命名为SpecularVertexLevel；新建材质(右键Create->Material)并命名为SpecularVertexLevelMat，将新建的Shader拖拽赋给新建材质。
+
 (3) 在场景中新建一个胶囊体(菜单栏GameObject->3D Object->Capsule)，将其材质修改为新建材质。
+
 (4) 保存场景。
 
 Shader实现：
@@ -434,6 +462,7 @@ Shader实现：
     }
 
 需要注意：
+
 - 漫反射部分与之前代码完全一致
 - 高光反射部分，首先计算了入射光线关于表面法线的反射方向reflectDir;然后变换后的顶点位置与世界空间下的相机位置相减得到世界空间下的视角方向，最后带入公式得到高光反射部分。
 - 此时的回调函数修改为Specular
@@ -454,7 +483,9 @@ Shader实现：
 准备工作：
 
 (1) 使用Scene_6_5和场景中添加的模型。
+
 (2) 新建Shader(右键Create->Shader->UnitySurfaceShader)并命名为SpecularPixelLevel；新建材质(右键Create->Material)并命名为SpecularPixelLevelMat，将新建的Shader拖拽赋给新建材质。
+
 (3) 保存场景。
 
 Shader实现：
@@ -557,7 +588,9 @@ Shader实现：
 准备工作：
 
 (1) 使用Scene_6_4和场景中添加的胶囊模型。
+
 (2) 新建Shader(右键Create->Shader->UnitySurfaceShader)并命名为BlinnPhong；新建材质(右键Create->Material)并命名为BlinnPhongMat，将新建的Shader拖拽赋给新建材质。
+
 (3) 保存场景。
 
 Shader实现：
@@ -652,13 +685,14 @@ Shader实现：
 ### 内置函数的妙用
 
 在计算光照模型时，往往需要得到光源方向和视角方向这两个基本信息等。且光源方向其实在不同的光源类型下很不相同。因此可以使用一些Unity的内置函数方便的得到一些基本信息：
+
 - UnityWorldSpaceLightDir : 输入一个模型空间的顶点位置返回世界空间从该顶点到摄像机的观察方向
 - UnityWorldSpaceViewDir : 输入一个世界空间的顶点位置返回世界空间从该顶点到摄像机的观察方向
 - UnityObjectToWorldNormal : 计算世界空间下的方向
 
 p.s.： 使用时需归一化
 
-#### 示例
+#### 示例1
 
     v2f vert(a2v v) {
         v2f o;
@@ -668,7 +702,9 @@ p.s.： 使用时需归一化
         ...
 
     }
-			
+
+#### 示例2
+
     fixed4 frag(v2f i) : SV_Target {
         ...
         
