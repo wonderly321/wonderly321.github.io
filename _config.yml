@@ -16,16 +16,14 @@ cayman-blog:
 theme: jekyll-theme-cayman
 
 # social
-author: Wonder
-image: /avatar.jpg
-twitter:
-  username: wonderly321
 
-github:
-  username: wonderly321
+github: wonderly321
+mail: wonderly321@gmail.com
 
-mail:
-  username: wonderly321
+# Comment
+comment:
+    disqus: vno-jekyll
+    # duoshuo:
 
 plugins:
   - jekyll-target-blank

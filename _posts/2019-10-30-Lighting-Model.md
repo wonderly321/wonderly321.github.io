@@ -9,9 +9,7 @@ meta: "Unity Shader"
 ---
 
 <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
-### 引题
-
-通常来讲，想要模拟真实的环境光照来生成一张图像需要考虑这样一种流程：首先，光线从**光源**中发射出来；然后，光线和场景中的一些物体相交，其中一部分光线被吸收，一部分被散射；最后，摄像机吸收了一些光，产生了一张图像
+通常来讲，想要模拟真实的环境光照来生成一张图像需要考虑这样一种流程：首先，光线从**光源**中发射出来；然后，光线和场景中的一些物体相交，其中一部分光线被吸收，一部分被散射；最后，摄像机吸收了一些光，产生了一张图像。
 
 #### 光源
 
@@ -75,13 +73,11 @@ BRDF全称**Bidirectional Reflectance Distribution Function**。当给定模型�
 
 
 
-$$c_{diffuse} = (c_{light}·m_{diffuse})max(0, \hat(n)·I)$$
+$$c_{diffuse} = (c_{light}·m_{diffuse})max(0, \hat n·I)$$
 
 
 
-![漫反射部分的计算公式](..\assets\image\formulas\6_1.gif)
-
-从公式可以看出，要计算漫反射需要知道4个参数：入射光线的颜色和强度![](..\assets\image\formulas\6_2.gif)，材质的漫反射系数![](..\assets\image\formulas\6_3.gif)，表面法线![](..\assets\image\formulas\6_4.gif)以及光源方向![](..\assets\image\formulas\6_5.gif)。
+从公式可以看出，要计算漫反射需要知道4个参数：入射光线的颜色和强度$c_{light}$，材质的漫反射系数$m_{diffuse}$，表面法线$\hat n$以及光源方向$I$。
 
 为防止点积结果为负值，需使用max操作，而CG提供的saturate函数可以达到同样的目的。
 
@@ -267,10 +263,14 @@ Shader实现：
 
 广义的半兰伯特光照模型公式如下：
 
-![](..\assets\image\formulas\6_6.png)
 
 
-其主要特点是没有用max操作来防止点积为负，而是对其结果进行了α倍的缩放再加上一个β大小的偏移。一般都取0.5。
+$$c_{diffuse} = (c_{light}·m_{diffuse})(\alpha(\hat n ·I) + \beta)$$
+
+
+
+
+其主要特点是没有用max操作来防止点积为负，而是对其结果进行了$\alpha$的缩放再加上一个$\beta$大小的偏移。一般都取0.5。
 
 效果图：
 
@@ -352,15 +352,23 @@ Shader实现：
 
 #### 计算公式
 
- 首先给出基本光照模型中高光反射部分的计算公式
+ 首先给出基本光照模型中高光反射部分的计算公式:
 
-![](..\assets\image\formulas\6_7.png)
 
- 从公式可以看出，要计算高光反射需要知道4个参数：入射光线的颜色和强度![](..\assets\image\formulas\6_2.gif)，材质的漫反射系数![](..\assets\image\formulas\6_8.png)，视角方向![](..\assets\image\formulas\6_9.png)以及反射方向![](formulas/6_10.png)。其中反射方向![](..\assets\image\formulas\6_10.png)可以由表面法线![](..\assets\image\formulas\6_4.gif)和光源方向![](..\assets\image\formulas\6_5.gif)计算出：
 
-![](..\assets\image\formulas\6_11.png)
+$$c_{specular} = (c_{light}·m_{specular})max(0, \hat v · r)$$
 
-此外，CG提供了计算反射方向的函数**Reflect**可以直接使用
+
+
+从公式可以看出，要计算高光反射需要知道4个参数：入射光线的颜色和强度$c_{light}$，材质的漫反射系数$m_{specular}$，视角方向$\hat v$以及反射方向$r$。其中反射方向$r$可以由表面法线$\hat n $和光源方向$I$计算出：
+
+
+
+$$r =2(\hat n · \hat I)\hat n - \hat I$$
+
+
+
+此外，CG提供了计算反射方向的函数**Reflect**可以直接使用。
 
 #### 逐顶点光照
 
@@ -564,13 +572,16 @@ Shader实现：
 
 #### Blinn-Phong模型
 
-之前提到还有另一种高光反射的实现方法——Blinn模型。它引入了一个新的矢量![](..\assets\image\formulas\6_12.png)，由对视角方向![](..\assets\image\formulas\6_9.png)和光源方向![](..\assets\image\formulas\6_5.gif)相加再归一化得到。
+之前提到还有另一种高光反射的实现方法——Blinn模型。它引入了一个新的矢量$\hat h$，由对视角方向$\hat v$和光源方向$I$相加再归一化得到:
 
- ![](..\assets\image\formulas\6_13.png)
+$$\hat h = \frac{\hat v + \hat I}{|\hat v + \hat I |}$$
+
+
 
 其计算公式如下：
 
- ![](..\assets\image\formulas\6_14.png)
+$$c_{specular} = (c_{light}· m_{specular})max(0, \hat n · \hat h)^{m_{gloss}} $$  
+
 
 
 效果图：
