@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: page
 title: "Unity中的基础光照"
 tagline: "通常来讲，想要模拟真实的环境光照来生成一张图像需要考虑这样一种流程：首先，光线从光源中发射出来；然后，光线和场景中的一些物体相交，其中一部分光线被吸收，一部分被散射；最后，摄像机吸收了一些光，产生了一张图像"
 categories: shader
@@ -9,8 +9,7 @@ meta: "Unity Shader"
 ---
 
 <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
- 
-<script type="text/x-mathjax-config">
+ <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   tex2jax: {
     inlineMath: [['$','$'], ['\\(','\\)']],
@@ -18,7 +17,7 @@ MathJax.Hub.Config({
   }
 });
 </script>
- 
+
 <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
       tex2jax: {
@@ -27,7 +26,7 @@ MathJax.Hub.Config({
     });
 </script>
 
-#### 通常来讲，想要模拟真实的环境光照来生成一张图像需要考虑这样一种流程：首先，光线从**光源**中发射出来；然后，光线和场景中的一些物体相交，其中一部分光线被吸收，一部分被散射；最后，摄像机吸收了一些光，产生了一张图像。
+通常来讲，想要模拟真实的环境光照来生成一张图像需要考虑这样一种流程：首先，光线从**光源**中发射出来；然后，光线和场景中的一些物体相交，其中一部分光线被吸收，一部分被散射；最后，摄像机吸收了一些光，产生了一张图像。
 
 #### 光源
 
