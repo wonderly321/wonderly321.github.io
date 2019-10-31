@@ -1,6 +1,6 @@
 ---
 layout: page
-title: "Unity中的基础光照"
+title: "Lighting Model I"
 categories: shader
 author: "Wonder"
 meta: "Unity Shader"

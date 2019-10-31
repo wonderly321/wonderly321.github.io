@@ -1,6 +1,6 @@
 ---
 layout: page
-title: "Unity中的基础光照"
+title: "Lighting Model II 实现漫反射光照模型"
 categories: shader
 author: "Wonder"
 meta: "Unity Shader"
@@ -14,7 +14,7 @@ meta: "Unity Shader"
 
     [Unity_Shader_GetIn](https://github.com/wonderly321/Unity_Shader_GetIn)
 
-<!--more-->
+
 
 #### 计算公式
 

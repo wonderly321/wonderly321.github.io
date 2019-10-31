@@ -1,6 +1,6 @@
 ---
 layout: page
-title: "Unity中的基础光照"
+title: "Lighting Model III 实现高光反射光照模型"
 categories: shader
 author: "Wonder"
 meta: "Unity Shader"
@@ -13,7 +13,7 @@ meta: "Unity Shader"
 - 项目地址：
 
     [Unity_Shader_GetIn](https://github.com/wonderly321/Unity_Shader_GetIn)
-<!--more-->
+    
 #### 计算公式
 
  首先给出基本光照模型中高光反射部分的计算公式:
