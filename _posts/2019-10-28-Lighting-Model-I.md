@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: post
 title: "Lighting Model I"
 categories: shader
 author: "Wonder"

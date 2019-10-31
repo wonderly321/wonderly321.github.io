@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: post
 title: "Lighting Model II 实现漫反射光照模型"
 categories: shader
 author: "Wonder"
