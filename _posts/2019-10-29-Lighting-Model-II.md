@@ -5,6 +5,7 @@ categories: shader
 author: "Wonder"
 meta: "Unity Shader"
 ---
+本文是Unity基础光照的第二部分，主要内容是实现漫反射光照模型。
 
 - 运行平台：
 
