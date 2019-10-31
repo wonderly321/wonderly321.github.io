@@ -1,7 +1,7 @@
 ---
 layout: page
 title: About
-tagline: A few more words about this theme
+tagline: Who I am
 permalink: /about.html
 ref: About
 order: 0

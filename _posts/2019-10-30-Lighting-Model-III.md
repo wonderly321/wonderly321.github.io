@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: post
 title: "Lighting Model III 实现高光反射光照模型"
 categories: shader
 author: "Wonder"

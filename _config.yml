@@ -1,5 +1,4 @@
 title: Wonder's Land
-image: avatar.jpg
 description: Wonder wants to be a TA.
 show_downloads: true
 
@@ -30,4 +29,4 @@ plugins:
 target-blank:
     rel: nofollow
 
-header_page_refs: ['About', 'Contact']
+header_page_refs: ['Home', 'Works', 'Tags', 'About']
