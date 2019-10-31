@@ -1,5 +1,5 @@
 title: Wonder's Land
-image: /avatar.jpg
+image: avatar.jpg
 description: Wonder wants to be a TA.
 show_downloads: true
 
@@ -13,7 +13,7 @@ google_analytics:
 cayman-blog:
   date_format: "%b %-d, %Y"
 
-theme: jekyll-theme-cayman
+theme: jekyll-theme-cayman-blog
 
 # social
 
