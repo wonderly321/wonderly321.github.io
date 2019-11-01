@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Lighting Model I"
+title: "Unity基础光照-Lighting Model I"
 categories: shader
 author: "Wonder"
 meta: "Unity Shader"

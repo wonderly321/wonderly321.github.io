@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Lighting Model III 实现高光反射光照模型"
+title: "Unity基础光照-Lighting Model III 实现高光反射光照模型"
 categories: shader
 author: "Wonder"
 meta: "Unity Shader"
