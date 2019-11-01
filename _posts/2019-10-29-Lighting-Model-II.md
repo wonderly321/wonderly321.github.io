@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Lighting Model II 实现漫反射光照模型"
+title: "Unity基础光照-Lighting Model II 实现漫反射光照模型"
 categories: shader
 author: "Wonder"
 meta: "Unity Shader"
