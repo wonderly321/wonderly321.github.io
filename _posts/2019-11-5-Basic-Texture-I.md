@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Unity纹理-引入和单张纹理"
+title: "Unity纹理-引题和单张纹理"
 categories: shader
 author: "Wonder"
 meta: "Unity Shader"
