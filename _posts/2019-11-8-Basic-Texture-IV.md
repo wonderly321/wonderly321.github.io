@@ -18,7 +18,7 @@ meta: "Unity Shader"
 
 #### 效果图
 
-| ![]({{site.url}}/assets/image/illustrations/5_1.png) | ![](../assets/image/illustrations/5_2.png) |
+| ![]({{site.url}}/assets/image/illustrations/5_1.png) | ![]({{site.url}}/assets/image/illustrations/5_2.png) |
 | ------------------------------------------ | ------------------------------------------ |
 | 漫反射+未遮罩的高光反射                    | 漫反射+未遮罩的高光反射                    |
 
