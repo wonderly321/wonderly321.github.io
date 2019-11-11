@@ -16,7 +16,7 @@ meta: "Unity Shader"
 
 
 
-> 通常使用Unity提供的Blend命令进行透明度混合。其命令语义如下表：
+> 通常使用Unity提供的Blend命令进行透明度混合。其命令语义如下：
 >
 > - Blend Off : 关闭混合
 > - Blend SrcFactor DstFactor : 开启混合，并设置混合因子。颜色缓冲中存入的值是由源颜色（该片元产生的颜色）和SrcFactor的乘积与目标颜色（已经存在于颜色缓冲中的颜色）与DstFactor的乘积相加得到的。
@@ -310,9 +310,7 @@ Shader "Custom/AlphaBlendBothSided"
 
 
 
-很简单，只需新建一个AlphaTestBothSideMat和对应得AlphatTestBothSide Shader的代码并复制粘贴AlphaTest代码，在pass中添加一行:
-
-此时我们可以透过镂空区域看到立方体内部的结构，效果如下：
+此时我们就可以透过半透明的表面看到立方体内部的结构啦，效果如下：
 
 | ![]({{site.url}}/assets/image/illustrations/7_1_4.png) | ![]({{site.url}}/assets/image/illustrations/7_1_5.png) | ![]({{site.url}}/assets/image/illustrations/7_1_6.png) |
 | :----------------------------------------------------: | :----------------------------------------------------: | :----------------------------------------------------: |
