@@ -45,7 +45,7 @@ meta: "Unity Shader"
 
 其他准备：一张透明纹理，其中每个方格的透明度不同（从左到右，从上到下依次是80%，70%，60%，50%）
 
-![](../assets/image/illustrations/6_2.png)
+![]({{site.url}}/assets/image/illustrations/6_2.png)
 
 **Shader实现**:
 
@@ -136,7 +136,7 @@ Shader "Custom/AlphaTest" {
 
 保存返回后，使用之前准备的透明纹理，并调节cutoff参数可以得到如下效果：
 
-| ![](../assets/image/illustrations/6_1_1.png) | ![](../assets/image/illustrations/6_1_2.png) | ![](../assets/image/illustrations/6_1_3.png) |
+| ![]({{site.url}}/assets/image/illustrations/6_1_1.png) | ![]({{site.url}}/assets/image/illustrations/6_1_2.png) | ![]({{site.url}}/assets/image/illustrations/6_1_3.png) |
 | :------------------------------------------: | :------------------------------------------: | :------------------------------------------: |
 |                 Alpha = 0.55                 |                 Alpha = 0.65                 |                 Alpha = 0.75                 |
 
@@ -175,7 +175,7 @@ Pass {
 
 此时我们可以透过镂空区域看到立方体内部的结构，效果如下：
 
-| ![](../assets/image/illustrations/6_1_4.png) | ![](../assets/image/illustrations/6_1_5.png) | ![](../assets/image/illustrations/6_1_6.png) |
+| ![]({{site.url}}/assets/image/illustrations/6_1_4.png) | ![]({{site.url}}/assets/image/illustrations/6_1_5.png) | ![]({{site.url}}/assets/image/illustrations/6_1_6.png) |
 | :------------------------------------------: | :------------------------------------------: | :------------------------------------------: |
 |                 Alpha = 0.55                 |                 Alpha = 0.65                 |                 Alpha = 0.75                 |
 
