@@ -1,15 +1,9 @@
 ---
-
 layout: post
-
 title: "Unity透明效果-开启深度写入的半透明效果实现"
-
 categories: shader
-
 author: "Wonder"
-
 meta: "Unity Shader"
-
 ---
 
 上一部分中提到了由于关闭深度写入而产生的遮挡问题，本小节将进行一种解决上述问题的实践——开启深度写入的两个Pass的透明效果实现。
