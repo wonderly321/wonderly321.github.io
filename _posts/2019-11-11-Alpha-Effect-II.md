@@ -162,7 +162,7 @@ Shader "Custom/AlphaTest" {
 
 那么如何实现呢？
 
-很简单，只需新建一个AlphaTestBothSideMat和对应得AlphatTestBothSide Shader的代码并复制粘贴AlphaTest代码，在pass中添加一行:
+很简单，只需新建一个AlphaTestBothSideMat和对应的AlphatTestBothSide Shader的代码并复制粘贴AlphaTest代码，在pass中添加一行:
 
 ```GLSL
 Pass {
