@@ -131,7 +131,7 @@ Shader "Custom/AlphaBlendZWrite"
 
 > 多说一句ColorMask,其语义可表示如下：
 >
-> ​	ColorMask RGB | A | 0 | 其他任何R, G, B, A的组合
+> ​	ColorMask RGB/A/0/其他任何R, G, B, A的组合
 
 
 
@@ -143,8 +143,7 @@ Shader "Custom/AlphaBlendZWrite"
 
 
 
-至此，透明效果的实践接近尾声了，但在之前的实践中`clip`,  `Blend` 等Unity内置的工具函数功不可没，还有许多没有提到的混合类型合效果，大家可以参考文末的链接到官网搜索以解疑惑~
-
+至此，透明效果的实践接近尾声了，但在之前的实践中`clip`, `Culling`, `Blend` 等Unity内置的工具函数功不可没，还有许多没有提到的混合类型合效果，大家可以参考文末的链接到官网搜索以解疑惑~
 
 
 ### 参考

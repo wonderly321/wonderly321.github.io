@@ -154,7 +154,7 @@ Shader "Custom/AlphaTest" {
 
 > Unity中Cull指令的语法如下：
 >
-> ​	Cull  Back | Front | Off
+> ​	Cull  Back/Front/Off
 >
 > 设置为Back则背面不渲染，其他同理。需要注意的是设置为**Off**时，渲染图元数目会成倍增加，因此通常情况下不会设置为**Off**
 
