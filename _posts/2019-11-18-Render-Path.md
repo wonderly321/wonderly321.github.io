@@ -12,13 +12,13 @@ meta: "Unity Shader"
 
 Unity提供了多个内置的渲染路径，他们是根据`Graphics Settings` 或者`Camera`的设置，而`Camera`可以覆盖`Graphics Settings`。默认情况下，该设置选择的是前向渲染路径（`Forward`）。
 
-![image-20191126210253678](../assets/image/posts_images/GraphicsSetting.png)
+![image-20191126210253678]({{site.url}}/assets/image/posts_images/GraphicsSetting.png)
 
 
 
 但有时对于具体的场景来说，不同的物体对象需要使用不同的渲染路径，因此`Camera`内的渲染路径设置对`GraphicSetting`的覆盖就可以完美的解决这个问题。
 
-![image-20191126210949506](../assets/image/posts_images/CameraSetting.png)
+![image-20191126210949506]({{site.url}}/assets/image/posts_images/CameraSetting.png)
 
 需要注意的是，如果当前的显卡并不支持所选择的渲染路径，Unity会自动使用更低一级的渲染路径。完成上面的设置后，我们就可以在每个Pass中使用标签来指定该Pass的渲染路径，具体语法是通过设置标签`LightMode`来实现。
 
