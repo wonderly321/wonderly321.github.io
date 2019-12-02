@@ -24,9 +24,9 @@ meta: "Unity Shader"
 Pass 1 {
 	//第一个Pass不进行光照计算，仅存储光照计算所需信息到G缓冲中
 	
-	for (each primitive in this model){
- 		for(each fragment covered by this primitive){
- 			if(failed in depth test){
+	for (each primitive in this model) {
+ 		for (each fragment covered by this primitive) {
+ 			if (failed in depth test) {
  				discard;//若没有通过深度测试，则该片元不可见
  			}
  			else {
@@ -39,8 +39,8 @@ Pass 1 {
 Pass 2 {
 	//利用G缓冲中的信息进行真正的光照计算
 	
-	for (each pixel in the screen){
-		if(the pixel is valid){
+	for (each pixel in the screen) {
+		if (the pixel is valid) {
         	//若该像素有效，则读取其G缓冲中的信息
         	readBuffer(pixel, materialInfo, pos, normal, lightDir, viewDir);
         	
@@ -49,7 +49,7 @@ Pass 2 {
         	//更新帧缓冲
         	writeFrameBuffer(pixel, color);
         }
-	}
+    }
 }
 ```
 
