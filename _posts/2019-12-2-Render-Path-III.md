@@ -61,7 +61,7 @@ Pass 2 {
 
 - 对抗锯齿（anti-aliasing）没有真正的支持，也不能处理半透明的物体对象。
 - 不支持Mesh渲染器(Mesh Renderer)的`RecieveShadow`（接受阴影）tag，并且支持的`culling masks`（剔除遮罩数）也是有限的。最多只能使用4个`culling mask`，也就是说，`culling layer mask`（剔除遮罩层）的设定不能少于所有层减去4个任意层的个数，即，32个层中的28个。
-- 对显卡有一定要求，显卡需要支持**MRT**（Mutlple Render Targets）、Shader-Model 3.0及以上、深度渲染纹理（Depth render texture）。 2006年以后生产的大多数PC（从GeForce 8xxx，Radeon X2400和Intel G45开始）显卡都支持延迟着色。 
+- 对显卡有一定要求，显卡需要支持**MRT**（Multiple Render Targets）、Shader Model 3.0及以上、深度渲染纹理（Depth render texture）。 2006年以后生产的大多数PC（从GeForce 8xxx，Radeon X2400和Intel G45开始）显卡都支持延迟着色。 
 
 当使用延迟渲染时，Unity要求我们提供两个Pass。
 
@@ -82,7 +82,7 @@ G缓冲中**渲染目标（Render Target, RT）**（RT0-RT4）的默认**布局(
 
  因此，默认的g缓冲区布局为160位/像素（非HDR）或192位/像素（HDR） 。 
 
-如果将**阴影蒙版（Shadowmask）**或**距离阴影蒙版（Distance Shadowmask）**模式用于混合光照(Mixed lighting)，则使用第五个目标：
+如果将**阴影蒙版（Shadow mask）**或**距离阴影蒙版（Distance Shadow mask）**模式用于混合光照(Mixed lighting)，则使用第五个目标：
 
 - RT4，ARGB32格式：光遮挡值（RGBA）。
 
