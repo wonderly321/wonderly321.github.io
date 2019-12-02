@@ -36,11 +36,11 @@ Pass 1 {
  		}
 	}
 }
-Pass 1 {
+Pass 2 {
 	//利用G缓冲中的信息进行真正的光照计算
 	
 	for (each pixel in the screen){
-        if(the pixel is valid){
+		if(the pixel is valid){
         	//若该像素有效，则读取其G缓冲中的信息
         	readBuffer(pixel, materialInfo, pos, normal, lightDir, viewDir);
         	
