@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Unity渲染路径延迟渲染路径"
+title: "Unity渲染路径——延迟渲染路径"
 categories: shader
 author: "Wonder"
 meta: "Unity Shader"
@@ -101,14 +101,7 @@ G缓冲中**渲染目标（Render Target, RT）**（RT0-RT4）的默认**布局(
 | _LightColor0  | float4   | 该pass处理逐像素光源的颜色                                   |
 | _LightMatrix0 | float4x4 | 从世界空间到光源空间的变换矩阵。可以用于采样cookie和光强衰减（attenuation）纹理 |
 
-一些可调用的内置函数仅供参考：
 
-| 函数名                                      | 描述                                                         |
-| ------------------------------------------- | ------------------------------------------------------------ |
-| float3    WorldSpaceLightDir(float4 v)      | 仅可用于前向渲染中。输入一个模型空间中的顶点位置，返回世界空间中的从该点到光源的光照方向。内部实现用了UnityWorldSpaceLightDir函数，没有被归一化 |
-| float3    UnityWorldSpaceLightDir(float4 v) | 仅可用于前向渲染中。输入一个世界空间中的顶点位置，返回世界空间中的从该点到光源的光照方向，没有被归一化 |
-| cfloat3    ObjSpaceLightDir(float4 v)       | 仅可用于前向渲染中。输入一个模型空间中的顶点位置，返回模型空间中的从该点到光源的光照方向，没有被归一化 |
-| float3    Shader4PointLights(...)           | 仅可用于前向渲染中。计算4个点光源的光照，其参数是已经打包进矢量的光照数据，通常是上述的内置变量，如unity_4LightPosX0等，用于计算逐顶点光照 |
 
 #### 渲染路径的选择
 
@@ -123,3 +116,6 @@ Unity的官方网站上其实还给出了其他的渲染路径以及它们的详
 [Unity Scripting Reference : https://docs.unity3d.com/ScriptReference/index.html](https://docs.unity3d.com/ScriptReference/index.html)
 
 [Unity_Shaders_Book : https://github.com/candycat1992/Unity_Shaders_Book](https://github.com/candycat1992/Unity_Shaders_Book)
+
+[LearnOpenGL-CN/Advanced Lighting/Deferred Shading](https://learnopengl-cn.readthedocs.io/zh/latest/05 Advanced Lighting/08 Deferred Shading/) 
+
