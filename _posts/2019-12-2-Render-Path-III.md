@@ -48,8 +48,8 @@ Pass 2 {
         	float4 color = Shading(materialInfo, pos, normal, lightDir, viewDir);
         	//更新帧缓冲
         	writeFrameBuffer(pixel, color);
-        }
-    }
+		}
+	}
 }
 ```
 
