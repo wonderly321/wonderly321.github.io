@@ -74,7 +74,7 @@ meta: "Unity Shader"
 
 **面光源**
 
-一个面光源由空间中的矩形限定。在所有方向上均匀地在其表面区域上发出光，但仅从矩形的一侧发出。对于面光源的范围没有手动控制，但是强度会随着距离光源的距离的平方成反比而减小。由于照明计算需要大量处理器，因此区域光在运行时不可用，只能烘焙为光照贴图。
+一个面光源由空间中的矩形限定。在所有方向上均匀地在其表面区域上发出光，但仅从矩形的一侧发出。对于面光源的范围没有手动控制，但是强度会随着距离光源的距离的平方成反比而减小。由于照明计算需要大量处理器，因此面光源在运行时不可用，只能烘焙为光照贴图。
 
 ![]({{site.url}}/assets/image/posts_images/AreaLightDiagram.svg)
 
@@ -115,6 +115,4 @@ meta: "Unity Shader"
 [Unity Scripting Reference : https://docs.unity3d.com/ScriptReference/index.html](https://docs.unity3d.com/ScriptReference/index.html)
 
 [Unity_Shaders_Book : https://github.com/candycat1992/Unity_Shaders_Book](https://github.com/candycat1992/Unity_Shaders_Book)
-
-[LearnOpenGL-CN/Advanced Lighting/Deferred Shading](https://learnopengl-cn.readthedocs.io/zh/latest/05 Advanced Lighting/08 Deferred Shading/) 
 
