@@ -232,7 +232,7 @@ Shader "Custom/ForwardRendering" {
 
 可以看到实验结果如下：
 
-![]({{site.url}}/assets/image/illustrations/9_2.png) ![]({{site.url}/assets/image/illustrations/9_2_1.png)
+![]({{site.url}}/assets/image/illustrations/9_2.png) ![]({{site.url}}/assets/image/illustrations/9_2_1.png)
 
 #### 分析
 
