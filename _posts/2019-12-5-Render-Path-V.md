@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Unity渲染路径——光源种类"
+title: "Unity渲染路径——不同光源的处理"
 categories: shader
 author: "Wonder"
 meta: "Unity Shader"
