@@ -6,6 +6,10 @@ author: "Wonder"
 meta: "Code Jam to IO for Women 2021"
 ---
 
+一转眼过去一年半了。
+
+终于又再次做了一直想搞清楚而终于花时间搞清楚了的事情。
+
 #### 1. Impartial Offerings
 
 按照宠物的体格大小为宠物公平分配食物，求最小食物份数
@@ -16,7 +20,7 @@ meta: "Code Jam to IO for Women 2021"
 
 code:
 
-```
+```python
 def Process(len, list):
     new_list = sorted(set(list))
     dict = {v: w for w, v in enumerate(new_list, 1)}
@@ -35,7 +39,6 @@ if __name__ == '__main__':
 ```
 
 <h4>2. Inconstant Ordering</h4>
-
 字符串成块排列按照第奇或偶块呈升序或降序，要求块连接处也符合这一标准。求字母序最小的字符串
 
 思路：
